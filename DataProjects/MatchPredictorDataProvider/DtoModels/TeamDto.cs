@@ -11,5 +11,6 @@ namespace MatchPredictorDataProvider.DtoModels
 		public string TeamName { get; set; }
 		public List<PlayerDto> Players { get; set; }
 		public TeamAttributes Attributes { get; set; }
+		public EloRating CurrentEloRating { get; set; }
 	}
 }

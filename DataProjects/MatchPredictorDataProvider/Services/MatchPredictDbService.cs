@@ -108,7 +108,8 @@ namespace MatchPredictorDataProvider.Services
 				Attributes = team.TeamAttributesTeamApi
 									.OrderByDescending(x => x.Date)
 									.FirstOrDefault(x => x.Date.Value <= matchDate),
-				Players = playersDto
+				Players = playersDto,
+				CurrentEloRating = await GetEloRatingForTeamAndDate(team.TeamApiId.Value, matchDate)
 			};
 		}
 

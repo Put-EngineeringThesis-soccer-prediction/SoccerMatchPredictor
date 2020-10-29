@@ -10,6 +10,5 @@ namespace MatchPredictorDataProvider.DtoModels
 		public Match MatchDetails { get; set; }
 		public TeamDto HomeTeam { get; set; }
 		public TeamDto AwayTeam { get; set; }
-		public string Winner { get; set; }
 	}
 }
