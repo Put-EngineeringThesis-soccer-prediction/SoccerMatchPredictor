@@ -11,40 +11,23 @@ namespace MatchPredictorDataProvider.Services
 {
 	public class MatchPredictDbService : IMatchPredictDbService
 	{
-		private readonly MatchPredictDbContext _contex;
+		private readonly MatchPredictDbContext _context;
 
 		public MatchPredictDbService(MatchPredictDbContext contex)
 		{
-			_contex = contex;
+			_context = contex;
 		}
 
-		public async Task<EloRatingInMatch> GetEloRatingForMatch(int matchId)
-		{
-			var match = await _contex.Match.SingleOrDefaultAsync(x => x.Id == matchId);
-			var homeTeamEloRating = await GetEloRatingForTeamAndDate(match.HomeTeamApiId.Value, match.Date.Value);
-			var awayTeamEloRating = await GetEloRatingForTeamAndDate(match.AwayTeamApiId.Value, match.Date.Value);
-			EloRatingInMatch result = new EloRatingInMatch
-			{
-				HomeTeamId = homeTeamEloRating.TeamApiId,
-				HomeTeamEloRating = homeTeamEloRating.Elo,
-				HomeTeamEloRatingDate = homeTeamEloRating.StartDate,
-				AwayTeamEloRating = awayTeamEloRating.Elo,
-				AwayTeamEloRatingDate = awayTeamEloRating.StartDate,
-				AwayTeamId = awayTeamEloRating.TeamApiId
-			};
-			return result;
-		}
-
-		public async Task<List<Match>> GetMatchesInGivenSeason(int season)
+		public async Task<List<int>> GetMatcheIdsInGivenSeason(int season)
 		{
 			string seasonYears = $"{season}/{season + 1}";
-			return await _contex.Match.Where(x => x.Season == seasonYears).ToListAsync();
+			return await _context.Match.Where(x => x.Season == seasonYears).Select(x => x.Id).ToListAsync();
 		}
 
-		public async Task<DetailedMatch> GetMatchesWithFullDetails(int matchId)
+		public async Task<DetailedMatch> GetMatchWithFullDetails(int matchId)
 		{
 			var result = new DetailedMatch();
-			var match = await _contex.Match.SingleOrDefaultAsync(x => x.Id == matchId);
+			var match = await _context.Match.SingleOrDefaultAsync(x => x.Id == matchId);
 			var homePlayerIds = new List<int?>
 			{
 				match.HomePlayer1,
@@ -83,15 +66,41 @@ namespace MatchPredictorDataProvider.Services
 			};
 		}
 
+		public async Task<TeamHistory> GetTeamMatchHistoryFromGivenMatch(int teamId, int matchId, int numberOfMatches)
+		{
+			Match givenMatch = await _context.Match.SingleOrDefaultAsync(x => x.Id == matchId);
+			Team requestedTeam = await _context.Team.SingleOrDefaultAsync(x => x.Id == teamId);
+
+			List<int> matchHistoryIds = await _context.Match
+				.Where(x => (x.HomeTeamApiId == requestedTeam.TeamApiId || x.AwayTeamApiId == requestedTeam.TeamApiId) && x.Date.Value < givenMatch.Date)
+				.OrderByDescending(x => x.Date)
+				.Select(x => x.Id)
+				.Take(numberOfMatches)
+				.ToListAsync();
+
+			List<DetailedMatch> matches = new List<DetailedMatch>();
+
+			foreach(int historiaclMatchId in matchHistoryIds)
+			{
+				matches.Add(await GetMatchWithFullDetails(historiaclMatchId));
+			}
+
+			return new TeamHistory
+			{
+				TeamId = teamId,
+				MatchHistory = matches
+			};
+		}
+
 		private async Task<TeamDto> BuildTeamDto(int teamId, List<int?> playersIds, DateTime matchDate)
 		{
 			var result = new TeamDto();
 
-			var team = await _contex.Team
+			var team = await _context.Team
 				.Include(x => x.TeamAttributesTeamApi)
 				.FirstOrDefaultAsync(x => x.TeamApiId == teamId);
 
-			var playersWithAttributes = await _contex.Player
+			var playersWithAttributes = await _context.Player
 				.Include(x => x.PlayerAttributesPlayerApi)
 				.Where(x => playersIds.Contains(x.PlayerApiId))
 				.ToListAsync();
@@ -130,7 +139,7 @@ namespace MatchPredictorDataProvider.Services
 
 		private async Task<EloRating> GetEloRatingForTeamAndDate(int teamId, DateTime date)
 		{
-			return await _contex.EloRating
+			return await _context.EloRating
 				.Where(x => x.TeamApiId == teamId && x.StartDate < date)
 				.OrderByDescending(x => x.StartDate)
 				.FirstOrDefaultAsync();

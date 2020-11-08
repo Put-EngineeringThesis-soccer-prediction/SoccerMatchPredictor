@@ -5,6 +5,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace MatchPredictorDataProvider
@@ -25,7 +26,7 @@ namespace MatchPredictorDataProvider
 			ILogger log)
 		{
 			log.LogInformation($"Run request for matches from season {season}/{season + 1}");
-			var o = (JArray)JToken.FromObject(await _matchPredictDbService.GetMatchesInGivenSeason(season));
+			var o = (JArray)JToken.FromObject(await _matchPredictDbService.GetMatcheIdsInGivenSeason(season));
 
 			return new OkObjectResult(o);
 		}
@@ -37,19 +38,21 @@ namespace MatchPredictorDataProvider
 		ILogger log)
 		{
 			log.LogInformation($"Run reuqest for match with id {matchId}");
-			var o = (JObject)JToken.FromObject(await _matchPredictDbService.GetMatchesWithFullDetails(matchId));
+			var o = (JObject)JToken.FromObject(await _matchPredictDbService.GetMatchWithFullDetails(matchId));
 
 			return new OkObjectResult(o);
 		}
 
-		[FunctionName("GetTeamsEloRating")]
-		public async Task<IActionResult> GetTeamsEloRating(
-		[HttpTrigger(AuthorizationLevel.Function, "get", Route = "EloRating/Match/{matchId}/")] HttpRequest req,
+		[FunctionName("GetTeamMatchHistory")]
+		public async Task<IActionResult> GetTeamMatchHistory(
+		[HttpTrigger(AuthorizationLevel.Function, "get", Route = "Matches/{matchId}/{teamId}/{numberOfMatches}")] HttpRequest req,
 		int matchId,
+		int teamId,
+		int numberOfMatches,
 		ILogger log)
 		{
-			log.LogInformation($"Run reuqest for elo rating for teams in match with id season {matchId}");
-			var o = (JObject)JToken.FromObject(await _matchPredictDbService.GetEloRatingForMatch(matchId));
+			log.LogInformation($"Run reuqest for match history for team {teamId} from match with id {matchId}. Getting maximum of {numberOfMatches} games back.");
+			var o = (JObject)JToken.FromObject(await _matchPredictDbService.GetTeamMatchHistoryFromGivenMatch(teamId, matchId, numberOfMatches));
 
 			return new OkObjectResult(o);
 		}
