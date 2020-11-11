@@ -5,7 +5,6 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace MatchPredictorDataProvider
@@ -19,26 +18,15 @@ namespace MatchPredictorDataProvider
 			_matchPredictDbService = matchPredictDbService;
 		}
 
-		[FunctionName("GetMatchesWithGivenSeason")]
-		public async Task<IActionResult> GetMatchesWithGivenSeason(
-			[HttpTrigger(AuthorizationLevel.Function, "get", Route = "Matches/Season/{season}")] HttpRequest req,
-			int season,
-			ILogger log)
-		{
-			log.LogInformation($"Run request for matches from season {season}/{season + 1}");
-			var o = (JArray)JToken.FromObject(await _matchPredictDbService.GetMatcheIdsInGivenSeason(season));
-
-			return new OkObjectResult(o);
-		}
-
-		[FunctionName("GetMatchFullDetails")]
-		public async Task<IActionResult> GetMatchFullDetails(
-		[HttpTrigger(AuthorizationLevel.Function, "get", Route = "Matches/{matchId}/")] HttpRequest req,
-		int matchId,
+		[FunctionName("GetDetailedMatchesInGivenSeason")]
+		public async Task<IActionResult> GetDetailedMatchesInGivenSeason(
+		[HttpTrigger(AuthorizationLevel.Function, "get", Route = "Matches/Season/DetailedMatch/{season}/{historicalMatches}")] HttpRequest req,
+		int season,
+		int historicalMatches,
 		ILogger log)
 		{
-			log.LogInformation($"Run reuqest for match with id {matchId}");
-			var o = (JObject)JToken.FromObject(await _matchPredictDbService.GetMatchWithFullDetails(matchId));
+			log.LogInformation($"Run request for matches from season {season}/{season + 1}");
+			var o = (JArray)JToken.FromObject(await _matchPredictDbService.GetDetailedMatchesInGivenSeason(season, historicalMatches));
 
 			return new OkObjectResult(o);
 		}

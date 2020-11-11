@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using SoccerDataImporter.DatabaseModels;
+using System.Collections.Generic;
 
 namespace MatchPredictorDataProvider.DtoModels
 {
 	public class TeamHistory
 	{
-		public int TeamId { get; set; }
-		public List<DetailedMatch> MatchHistory { get; set;}
+		public List<Match> MatchHistory { get; set;}
 	}
 }

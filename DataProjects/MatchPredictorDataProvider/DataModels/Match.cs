@@ -1,5 +1,5 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace SoccerDataImporter.DatabaseModels
 {
@@ -16,73 +16,207 @@ namespace SoccerDataImporter.DatabaseModels
 		public int? AwayTeamApiId { get; set; }
 		public int? HomeTeamGoal { get; set; }
 		public int? AwayTeamGoal { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerX1 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerX2 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerX3 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerX4 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerX5 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerX6 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerX7 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerX8 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerX9 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerX10 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerX11 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerX1 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerX2 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerX3 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerX4 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerX5 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerX6 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerX7 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerX8 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerX9 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerX10 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerX11 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerY1 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerY2 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerY3 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerY4 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerY5 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerY6 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerY7 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerY8 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerY9 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerY10 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayerY11 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerY1 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerY2 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerY3 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerY4 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerY5 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerY6 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerY7 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerY8 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerY9 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerY10 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayerY11 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayer1 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayer2 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayer3 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayer4 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayer5 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayer6 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayer7 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayer8 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayer9 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayer10 { get; set; }
+
+		[JsonIgnore]
 		public int? HomePlayer11 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayer1 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayer2 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayer3 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayer4 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayer5 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayer6 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayer7 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayer8 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayer9 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayer10 { get; set; }
+
+		[JsonIgnore]
 		public int? AwayPlayer11 { get; set; }
+
 		public int? HomeTeamShots { get; set; }
+
 		public int? AwayTeamShots { get; set; }
 		public int? HomeTeamShotsOnTarget { get; set; }
 		public int? AwayTeamShotsOnTarget { get; set; }
@@ -127,54 +261,79 @@ namespace SoccerDataImporter.DatabaseModels
 
 		[JsonIgnore]
 		public virtual Player AwayPlayer10Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player AwayPlayer11Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player AwayPlayer1Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player AwayPlayer2Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player AwayPlayer3Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player AwayPlayer4Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player AwayPlayer5Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player AwayPlayer6Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player AwayPlayer7Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player AwayPlayer8Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player AwayPlayer9Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Team AwayTeamApi { get; set; }
+
 		[JsonIgnore]
 		public virtual Country Country { get; set; }
+
 		[JsonIgnore]
 		public virtual Player HomePlayer10Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player HomePlayer11Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player HomePlayer1Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player HomePlayer2Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player HomePlayer3Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player HomePlayer4Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player HomePlayer5Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player HomePlayer6Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player HomePlayer7Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player HomePlayer8Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Player HomePlayer9Navigation { get; set; }
+
 		[JsonIgnore]
 		public virtual Team HomeTeamApi { get; set; }
+
 		[JsonIgnore]
 		public virtual League League { get; set; }
 	}

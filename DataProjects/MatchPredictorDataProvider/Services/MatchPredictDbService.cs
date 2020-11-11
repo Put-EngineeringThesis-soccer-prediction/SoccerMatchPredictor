@@ -18,52 +18,61 @@ namespace MatchPredictorDataProvider.Services
 			_context = contex;
 		}
 
-		public async Task<List<int>> GetMatcheIdsInGivenSeason(int season)
+		public async Task<List<DetailedMatchWithHistory>> GetDetailedMatchesInGivenSeason(int season, int numberOfMatches)
 		{
 			string seasonYears = $"{season}/{season + 1}";
-			return await _context.Match.Where(x => x.Season == seasonYears).Select(x => x.Id).ToListAsync();
-		}
-
-		public async Task<DetailedMatch> GetMatchWithFullDetails(int matchId)
-		{
-			var result = new DetailedMatch();
-			var match = await _context.Match.SingleOrDefaultAsync(x => x.Id == matchId);
-			var homePlayerIds = new List<int?>
+			var matches = await _context.Match.Where(x => x.Season == seasonYears)
+				.Include(x => x.HomeTeamApi).ThenInclude(y => y.TeamAttributesTeamApi)
+				.Include(x => x.AwayTeamApi).ThenInclude(y => y.TeamAttributesTeamApi)
+				.ToListAsync();
+			var result = new List<DetailedMatchWithHistory>();
+			foreach (var match in matches)
 			{
-				match.HomePlayer1,
-				match.HomePlayer2,
-				match.HomePlayer3,
-				match.HomePlayer4,
-				match.HomePlayer5,
-				match.HomePlayer6,
-				match.HomePlayer7,
-				match.HomePlayer8,
-				match.HomePlayer9,
-				match.HomePlayer10,
-				match.HomePlayer11
-			};
+				var homePlayerIds = new List<int?>
+				{
+					match.HomePlayer1,
+					match.HomePlayer2,
+					match.HomePlayer3,
+					match.HomePlayer4,
+					match.HomePlayer5,
+					match.HomePlayer6,
+					match.HomePlayer7,
+					match.HomePlayer8,
+					match.HomePlayer9,
+					match.HomePlayer10,
+					match.HomePlayer11
+				};
 
-			var awayPlayersIds = new List<int?>
-			{
-				match.AwayPlayer1,
-				match.AwayPlayer2,
-				match.AwayPlayer3,
-				match.AwayPlayer4,
-				match.AwayPlayer5,
-				match.AwayPlayer6,
-				match.AwayPlayer7,
-				match.AwayPlayer8,
-				match.AwayPlayer9,
-				match.AwayPlayer10,
-				match.AwayPlayer11
-			};
+				var awayPlayersIds = new List<int?>
+				{
+					match.AwayPlayer1,
+					match.AwayPlayer2,
+					match.AwayPlayer3,
+					match.AwayPlayer4,
+					match.AwayPlayer5,
+					match.AwayPlayer6,
+					match.AwayPlayer7,
+					match.AwayPlayer8,
+					match.AwayPlayer9,
+					match.AwayPlayer10,
+					match.AwayPlayer11
+				};
 
-			return new DetailedMatch
-			{
-				MatchDetails = match,
-				HomeTeam = await BuildTeamDto(match.HomeTeamApiId.Value, homePlayerIds, match.Date.Value),
-				AwayTeam = await BuildTeamDto(match.AwayTeamApiId.Value, awayPlayersIds, match.Date.Value)
-			};
+				var homeTeam = await BuildTeamDto(match.HomeTeamApi, homePlayerIds, match.Date.Value);
+
+				var awayTeam = await BuildTeamDto(match.AwayTeamApi, awayPlayersIds, match.Date.Value);
+
+				result.Add(new DetailedMatchWithHistory
+				{
+					MatchDetails = match,
+					HomeTeam = homeTeam,
+					AwayTeam = awayTeam,
+					HomeTeamHistory = await GetTeamMatchHistoryFromGivenMatch(homeTeam, match.Date.Value, numberOfMatches, matches),
+					AwayTeamHistory = await GetTeamMatchHistoryFromGivenMatch(awayTeam, match.Date.Value, numberOfMatches, matches)
+				});
+				return result;
+			}
+			return result;
 		}
 
 		public async Task<TeamHistory> GetTeamMatchHistoryFromGivenMatch(int teamId, int matchId, int numberOfMatches)
@@ -71,34 +80,53 @@ namespace MatchPredictorDataProvider.Services
 			Match givenMatch = await _context.Match.SingleOrDefaultAsync(x => x.Id == matchId);
 			Team requestedTeam = await _context.Team.SingleOrDefaultAsync(x => x.Id == teamId);
 
-			List<int> matchHistoryIds = await _context.Match
+			List<Match> matchHistory = await _context.Match
 				.Where(x => (x.HomeTeamApiId == requestedTeam.TeamApiId || x.AwayTeamApiId == requestedTeam.TeamApiId) && x.Date.Value < givenMatch.Date)
 				.OrderByDescending(x => x.Date)
-				.Select(x => x.Id)
 				.Take(numberOfMatches)
 				.ToListAsync();
 
-			List<DetailedMatch> matches = new List<DetailedMatch>();
 
-			foreach(int historiaclMatchId in matchHistoryIds)
+			return new TeamHistory
 			{
-				matches.Add(await GetMatchWithFullDetails(historiaclMatchId));
+				MatchHistory = matchHistory
+			};
+		}
+
+		private async Task<TeamHistory> GetTeamMatchHistoryFromGivenMatch(
+			TeamDto requestedTeam, 
+			DateTime matchDate, 
+			int numberOfMatches, 
+			List<Match> downloadedMatches)
+		{
+
+			List<Match> matchHistory = downloadedMatches
+				.Where(x => (x.HomeTeamApiId == requestedTeam.TeamApiId || x.AwayTeamApiId == requestedTeam.TeamApiId) && x.Date.Value < matchDate)
+				.OrderByDescending(x => x.Date)
+				.Take(numberOfMatches)
+				.ToList();
+
+			int matchesFound = matchHistory.Count;
+			if (matchesFound < numberOfMatches)
+			{
+				var lastFoundMatch = matchHistory.LastOrDefault();
+				DateTime searchableDate = lastFoundMatch is null ? matchDate : lastFoundMatch.Date.Value;
+				matchHistory.AddRange(await _context.Match
+					.Where(x => (x.HomeTeamApiId == requestedTeam.TeamApiId || x.AwayTeamApiId == requestedTeam.TeamApiId) && x.Date.Value < searchableDate)
+					.OrderByDescending(x => x.Date)
+					.Take(numberOfMatches - matchesFound)
+					.ToListAsync());
 			}
 
 			return new TeamHistory
 			{
-				TeamId = teamId,
-				MatchHistory = matches
+				MatchHistory = matchHistory
 			};
 		}
 
-		private async Task<TeamDto> BuildTeamDto(int teamId, List<int?> playersIds, DateTime matchDate)
+		private async Task<TeamDto> BuildTeamDto(Team team, List<int?> playersIds, DateTime matchDate)
 		{
 			var result = new TeamDto();
-
-			var team = await _context.Team
-				.Include(x => x.TeamAttributesTeamApi)
-				.FirstOrDefaultAsync(x => x.TeamApiId == teamId);
 
 			var playersWithAttributes = await _context.Player
 				.Include(x => x.PlayerAttributesPlayerApi)
@@ -113,6 +141,7 @@ namespace MatchPredictorDataProvider.Services
 			return new TeamDto
 			{
 				Id = team.Id,
+				TeamApiId = team.TeamApiId.Value,
 				TeamName = team.TeamLongName,
 				Attributes = team.TeamAttributesTeamApi
 									.OrderByDescending(x => x.Date)
