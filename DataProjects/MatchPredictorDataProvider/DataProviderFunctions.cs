@@ -31,16 +31,16 @@ namespace MatchPredictorDataProvider
 			return new OkObjectResult(o);
 		}
 
-		[FunctionName("GetTeamMatchHistory")]
-		public async Task<IActionResult> GetTeamMatchHistory(
-		[HttpTrigger(AuthorizationLevel.Function, "get", Route = "Matches/{matchId}/{teamId}/{numberOfMatches}")] HttpRequest req,
-		int matchId,
+		[FunctionName("GetDetailedMatchesInGivenSeasonForATeam")]
+		public async Task<IActionResult> GetDetailedMatchesInGivenSeasonForATeam(
+		[HttpTrigger(AuthorizationLevel.Function, "get", Route = "Matches/Season/DetailedMatch/{season}/{teamId}/{historicalMatches}")] HttpRequest req,
+		int season,
 		int teamId,
-		int numberOfMatches,
+		int historicalMatches,
 		ILogger log)
 		{
-			log.LogInformation($"Run reuqest for match history for team {teamId} from match with id {matchId}. Getting maximum of {numberOfMatches} games back.");
-			var o = (JObject)JToken.FromObject(await _matchPredictDbService.GetTeamMatchHistoryFromGivenMatch(teamId, matchId, numberOfMatches));
+			log.LogInformation($"Run request for matches from season {season}/{season + 1}");
+			var o = (JArray)JToken.FromObject(await _matchPredictDbService.GetDetailedMatchesInGivenSeason(season, historicalMatches, teamId));
 
 			return new OkObjectResult(o);
 		}

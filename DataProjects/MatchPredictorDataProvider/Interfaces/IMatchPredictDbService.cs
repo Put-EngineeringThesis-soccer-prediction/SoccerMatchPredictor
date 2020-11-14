@@ -6,7 +6,6 @@ namespace MatchPredictorDataProvider.Interfaces
 {
 	public interface IMatchPredictDbService
 	{
-		Task<List<DetailedMatchWithHistory>> GetDetailedMatchesInGivenSeason(int season, int numberOfMatches);
-		Task<TeamHistory> GetTeamMatchHistoryFromGivenMatch(int teamId, int matchId, int numberOfMatches);
+		Task<List<DetailedMatchWithHistory>> GetDetailedMatchesInGivenSeason(int season, int numberOfMatches, int? teamId = null);
 	}
 }

@@ -18,14 +18,28 @@ namespace MatchPredictorDataProvider.Services
 			_context = contex;
 		}
 
-		public async Task<List<DetailedMatchWithHistory>> GetDetailedMatchesInGivenSeason(int season, int numberOfMatches)
+		public async Task<List<DetailedMatchWithHistory>> GetDetailedMatchesInGivenSeason(int season, int numberOfMatches, int? teamId = null)
 		{
 			string seasonYears = $"{season}/{season + 1}";
-			var matches = await _context.Match.Where(x => x.Season == seasonYears)
-				.Include(x => x.HomeTeamApi).ThenInclude(y => y.TeamAttributesTeamApi)
-				.Include(x => x.AwayTeamApi).ThenInclude(y => y.TeamAttributesTeamApi)
-				.ToListAsync();
+			var matches = new List<Match>();
+			if (teamId is null)
+			{
+				matches = await _context.Match.Where(x => x.Season == seasonYears)
+					.Include(x => x.HomeTeamApi).ThenInclude(y => y.TeamAttributesTeamApi)
+					.Include(x => x.AwayTeamApi).ThenInclude(y => y.TeamAttributesTeamApi)
+					.ToListAsync();
+			}
+			else
+			{
+				var team = await _context.Team.SingleAsync(x => x.Id == teamId.Value);
+				matches = await _context.Match
+					.Where(x => x.Season == seasonYears && (x.HomeTeamApiId == team.TeamApiId || x.AwayTeamApiId == team.TeamApiId))
+					.Include(x => x.HomeTeamApi).ThenInclude(y => y.TeamAttributesTeamApi)
+					.Include(x => x.AwayTeamApi).ThenInclude(y => y.TeamAttributesTeamApi)
+					.ToListAsync();
+			}
 			var result = new List<DetailedMatchWithHistory>();
+			var lastSeasonPointsDict = new Dictionary<int, (int? lastSeasonPoints, int seasonsPlayed)>();
 			foreach (var match in matches)
 			{
 				var homePlayerIds = new List<int?>
@@ -58,9 +72,29 @@ namespace MatchPredictorDataProvider.Services
 					match.AwayPlayer11
 				};
 
-				var homeTeam = await BuildTeamDto(match.HomeTeamApi, homePlayerIds, match.Date.Value);
+				if (!lastSeasonPointsDict.ContainsKey(match.HomeTeamApi.Id))
+				{
+					lastSeasonPointsDict.Add(match.HomeTeamApi.Id, (
+						await CalculateTeamsPointsInASeason(match.HomeTeamApi.Id, season - 1),
+						await GetSeasonPlayedUntilToday(match.HomeTeamApiId, match.Date.Value)));
+				}
 
-				var awayTeam = await BuildTeamDto(match.AwayTeamApi, awayPlayersIds, match.Date.Value);
+				if (!lastSeasonPointsDict.ContainsKey(match.AwayTeamApi.Id))
+				{
+					lastSeasonPointsDict.Add(match.AwayTeamApi.Id, (
+						await CalculateTeamsPointsInASeason(match.AwayTeamApi.Id, season - 1),
+						await GetSeasonPlayedUntilToday(match.AwayTeamApiId, match.Date.Value)));
+				}
+
+				var homeTeam = await BuildTeamDto(match.HomeTeamApi,
+									  homePlayerIds,
+									  match.Date.Value,
+									  lastSeasonPointsDict[match.HomeTeamApi.Id]);
+
+				var awayTeam = await BuildTeamDto(match.AwayTeamApi,
+									  awayPlayersIds,
+									  match.Date.Value,
+									  lastSeasonPointsDict[match.AwayTeamApi.Id]);
 
 				result.Add(new DetailedMatchWithHistory
 				{
@@ -70,27 +104,9 @@ namespace MatchPredictorDataProvider.Services
 					HomeTeamHistory = await GetTeamMatchHistoryFromGivenMatch(homeTeam, match.Date.Value, numberOfMatches, matches),
 					AwayTeamHistory = await GetTeamMatchHistoryFromGivenMatch(awayTeam, match.Date.Value, numberOfMatches, matches)
 				});
-				return result;
 			}
+
 			return result;
-		}
-
-		public async Task<TeamHistory> GetTeamMatchHistoryFromGivenMatch(int teamId, int matchId, int numberOfMatches)
-		{
-			Match givenMatch = await _context.Match.SingleOrDefaultAsync(x => x.Id == matchId);
-			Team requestedTeam = await _context.Team.SingleOrDefaultAsync(x => x.Id == teamId);
-
-			List<Match> matchHistory = await _context.Match
-				.Where(x => (x.HomeTeamApiId == requestedTeam.TeamApiId || x.AwayTeamApiId == requestedTeam.TeamApiId) && x.Date.Value < givenMatch.Date)
-				.OrderByDescending(x => x.Date)
-				.Take(numberOfMatches)
-				.ToListAsync();
-
-
-			return new TeamHistory
-			{
-				MatchHistory = matchHistory
-			};
 		}
 
 		private async Task<TeamHistory> GetTeamMatchHistoryFromGivenMatch(
@@ -124,7 +140,7 @@ namespace MatchPredictorDataProvider.Services
 			};
 		}
 
-		private async Task<TeamDto> BuildTeamDto(Team team, List<int?> playersIds, DateTime matchDate)
+		private async Task<TeamDto> BuildTeamDto(Team team, List<int?> playersIds, DateTime matchDate, (int? lastSeasonPoints, int seasonsPlayed) lastSeasonInformation)
 		{
 			var result = new TeamDto();
 
@@ -143,12 +159,24 @@ namespace MatchPredictorDataProvider.Services
 				Id = team.Id,
 				TeamApiId = team.TeamApiId.Value,
 				TeamName = team.TeamLongName,
+				SeasonsPlayed = lastSeasonInformation.seasonsPlayed,
+				LastSeasonPoints = lastSeasonInformation.lastSeasonPoints,
 				Attributes = team.TeamAttributesTeamApi
 									.OrderByDescending(x => x.Date)
 									.FirstOrDefault(x => x.Date.Value <= matchDate),
 				Players = playersDto,
 				CurrentEloRating = await GetEloRatingForTeamAndDate(team.TeamApiId.Value, matchDate)
 			};
+		}
+
+		private async Task<int> GetSeasonPlayedUntilToday(int? teamApiId, DateTime matchDate)
+		{
+			var distinctSeasons = await _context.Match
+				.Where(x => (x.HomeTeamApiId == teamApiId || x.AwayTeamApiId == teamApiId) && x.Date.Value <= matchDate)
+				.Select(x => x.Season)
+				.Distinct()
+				.ToListAsync();
+			return distinctSeasons.Count() - 1;
 		}
 
 		private PlayerDto MapPlayerToPlayerDto(Player player, DateTime matchDate)
@@ -172,6 +200,50 @@ namespace MatchPredictorDataProvider.Services
 				.Where(x => x.TeamApiId == teamId && x.StartDate < date)
 				.OrderByDescending(x => x.StartDate)
 				.FirstOrDefaultAsync();
+		}
+
+		private async Task<int?> CalculateTeamsPointsInASeason(int teamId, int season)
+		{
+			string seasonYears = $"{season}/{season + 1}";
+			var team = await _context
+				.Team
+				.FirstAsync(x => x.Id == teamId);
+			var teamApiId = team.TeamApiId;
+			var matchesInLastSeason = await _context
+				.Match
+				.Where(x => (x.HomeTeamApiId == teamApiId || x.AwayTeamApiId == teamApiId) && x.Season == seasonYears)
+				.ToListAsync();
+			if(matchesInLastSeason is null)
+			{
+				return null;
+			}
+			int result = 0;
+			foreach(var match in matchesInLastSeason)
+			{
+				if(match.HomeTeamApiId == teamApiId)
+				{
+					if(match.HomeTeamGoal > match.AwayTeamGoal)
+					{
+						result += 3;
+					}
+					else if(match.HomeTeamGoal == match.AwayTeamGoal)
+					{
+						result += 1;
+					}
+				}
+				else if (match.AwayTeamApiId == teamApiId)
+				{
+					if (match.HomeTeamGoal < match.AwayTeamGoal)
+					{
+						result += 3;
+					}
+					else if (match.HomeTeamGoal == match.AwayTeamGoal)
+					{
+						result += 1;
+					}
+				}
+			}
+			return result;
 		}
 	}
 }
