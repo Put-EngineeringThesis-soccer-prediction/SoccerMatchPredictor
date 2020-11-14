@@ -1,8 +1,10 @@
-import numpy as np
-
-def print_hi(name):
-    ll = np.linspace(10, 5, 5)
-    print(ll)
+from data_aggregator import DataAggregator
+from season import Season
+from parameters import Parameters
+from team import Team
 
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    data_aggregator = DataAggregator()
+    data_aggregator.get_data_for_seasons([Season.y2011, Season.y2012], Parameters(no_last_matches=3))
+    data_aggregator.get_data_for_team_in_seasons(Team.Arsenal, [Season.y2011, Season.y2012],
+                                                 Parameters(no_last_matches=3))
