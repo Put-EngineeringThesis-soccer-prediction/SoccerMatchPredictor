@@ -12,5 +12,6 @@ namespace MatchPredictorDataProvider.DtoModels
 		public TeamDto AwayTeam { get; set; }
 		public TeamHistory HomeTeamHistory { get; set; }
 		public TeamHistory AwayTeamHistory { get; set; }
+		public List<EncounterHistoryDto> PastEncounters { get; internal set; }
 	}
 }

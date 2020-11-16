@@ -36,10 +36,12 @@ namespace MatchPredictorDataProvider.Services
 					.Where(x => x.Season == seasonYears && (x.HomeTeamApiId == team.TeamApiId || x.AwayTeamApiId == team.TeamApiId))
 					.Include(x => x.HomeTeamApi).ThenInclude(y => y.TeamAttributesTeamApi)
 					.Include(x => x.AwayTeamApi).ThenInclude(y => y.TeamAttributesTeamApi)
+					.OrderByDescending(x => x.Date)
 					.ToListAsync();
 			}
 			var result = new List<DetailedMatchWithHistory>();
 			var lastSeasonPointsDict = new Dictionary<int, (int? lastSeasonPoints, int seasonsPlayed)>();
+			var previousEncountersDict = new Dictionary<string, List<EncounterHistoryDto>>();
 			foreach (var match in matches)
 			{
 				var homePlayerIds = new List<int?>
@@ -86,6 +88,17 @@ namespace MatchPredictorDataProvider.Services
 						await GetSeasonPlayedUntilToday(match.AwayTeamApiId, match.Date.Value)));
 				}
 
+				string idCombo = match.HomeTeamApi.Id > match.AwayTeamApi.Id ? 
+					$"{match.HomeTeamApi.Id}_{match.AwayTeamApi.Id}" : 
+					$"{match.AwayTeamApi.Id}_{match.HomeTeamApi.Id}";
+
+				if (!previousEncountersDict.ContainsKey(idCombo))
+				{
+					previousEncountersDict.Add(
+						idCombo, 
+						await FindPastEncountersSinceMatch(match.HomeTeamApi, match.AwayTeamApi, match.Date.Value));
+				}
+
 				var homeTeam = await BuildTeamDto(match.HomeTeamApi,
 									  homePlayerIds,
 									  match.Date.Value,
@@ -102,7 +115,39 @@ namespace MatchPredictorDataProvider.Services
 					HomeTeam = homeTeam,
 					AwayTeam = awayTeam,
 					HomeTeamHistory = await GetTeamMatchHistoryFromGivenMatch(homeTeam, match.Date.Value, numberOfMatches, matches),
-					AwayTeamHistory = await GetTeamMatchHistoryFromGivenMatch(awayTeam, match.Date.Value, numberOfMatches, matches)
+					AwayTeamHistory = await GetTeamMatchHistoryFromGivenMatch(awayTeam, match.Date.Value, numberOfMatches, matches),
+					PastEncounters = previousEncountersDict[idCombo].Where(x => x.Date < match.Date).ToList()
+				});
+			}
+
+			return result.OrderBy(x => x.MatchDetails.Date).ToList();
+		}
+
+		private async Task<List<EncounterHistoryDto>> FindPastEncountersSinceMatch(Team FirstTeam, Team SecondTeam, DateTime matchDate)
+		{
+			var encounters  = await _context.Match
+				.Where(x =>
+				((x.HomeTeamApiId == FirstTeam.TeamApiId && x.AwayTeamApiId == SecondTeam.TeamApiId) ||
+				(x.HomeTeamApiId == SecondTeam.TeamApiId && x.AwayTeamApiId == FirstTeam.TeamApiId)) && 
+				x.Date < matchDate)
+				.OrderByDescending(x => x.Date)
+				.ToListAsync();
+			var result = new List<EncounterHistoryDto>();
+			foreach(var encounter in encounters)
+			{
+				var homeTeam = encounter.HomeTeamApiId == FirstTeam.TeamApiId ? FirstTeam : SecondTeam;
+				var awayTeam = encounter.AwayTeamApiId == FirstTeam.TeamApiId ? FirstTeam : SecondTeam;
+				result.Add(new EncounterHistoryDto
+				{
+					HomeTeamId = homeTeam.Id,
+					HomeTeamApiId = homeTeam.TeamApiId.Value,
+					HomeTeamName = homeTeam.TeamLongName,
+					HomeTeamGoals = encounter.HomeTeamGoal.Value,
+					AwayTeamId = awayTeam.Id,
+					AwayTeamApiId = awayTeam.TeamApiId.Value,
+					AwayTeamName = awayTeam.TeamLongName,
+					AwayTeamGoals = encounter.AwayTeamGoal.Value,
+					Date = encounter.Date.Value
 				});
 			}
 
