@@ -2,6 +2,7 @@ import json
 from types import SimpleNamespace
 from datetime import datetime
 from match import Match
+from past_encounter import PastEncounter
 import pandas as pd
 
 
@@ -10,6 +11,7 @@ class Preprocessor:
 
     def process_data(self, data):
         matches = []
+        past_encounters = {}
 
         for season in data:
             raw_matches = json.loads(season, object_hook=lambda d: SimpleNamespace(**d))
@@ -17,9 +19,16 @@ class Preprocessor:
             for raw in raw_matches:
                 # proceed only if history is provided for both teams
                 if raw.HomeTeamHistory.MatchHistory and raw.AwayTeamHistory.MatchHistory:
+                    match_id = raw.MatchDetails.Id
+                    home_team_id = raw.HomeTeam.Id
+                    away_team_id = raw.AwayTeam.Id
+                    home_team_name = raw.HomeTeam.TeamName
+                    away_team_name = raw.AwayTeam.TeamName
                     home_team_api_id = raw.MatchDetails.HomeTeamApiId
                     away_team_api_id = raw.MatchDetails.AwayTeamApiId
+                    raw_match_date = raw.MatchDetails.Date
                     match_date = datetime.strptime(raw.MatchDetails.Date, self.date_format)
+                    match_result = self.__get_match_result(raw.MatchDetails)
 
                     home_team_score = self.__calculate_team_score(raw.HomeTeam.Attributes)
                     away_team_score = self.__calculate_team_score(raw.AwayTeam.Attributes)
@@ -51,18 +60,28 @@ class Preprocessor:
                     away_scored_goals = self.__calculate_scored_goals(raw.AwayTeamHistory.MatchHistory,
                                                                       away_team_api_id)
 
-                    match = Match(home_team_score, away_team_score, home_team_seasons_played, away_team_seasons_played,
-                                  home_team_last_season_points, away_team_last_season_points, home_players_avg_age,
-                                  away_players_avg_age, home_players_avg_rating, away_players_avg_rating,
-                                  home_elo_rating,
-                                  away_elo_rating, avg_home_win_odds, avg_draw_odds, avg_away_win_odds,
-                                  home_avg_corners,
-                                  away_avg_corners, home_avg_shots, away_avg_shots, home_won_games, away_won_games,
-                                  home_tied_games, away_tied_games, home_lost_games, away_lost_games, home_scored_goals,
-                                  away_scored_goals)
+                    match = Match(match_id, home_team_id, away_team_id, home_team_name, away_team_name, raw_match_date,
+                                  match_result, home_team_score, away_team_score, home_team_seasons_played,
+                                  away_team_seasons_played, home_team_last_season_points, away_team_last_season_points,
+                                  home_players_avg_age, away_players_avg_age, home_players_avg_rating,
+                                  away_players_avg_rating, home_elo_rating, away_elo_rating, avg_home_win_odds,
+                                  avg_draw_odds, avg_away_win_odds, home_avg_corners, away_avg_corners, home_avg_shots,
+                                  away_avg_shots, home_won_games, away_won_games, home_tied_games, away_tied_games,
+                                  home_lost_games, away_lost_games, home_scored_goals, away_scored_goals)
                     matches.append(match)
 
-        return pd.DataFrame([vars(m) for m in matches])
+                    encounters = self.__get_past_encounters(raw.PastEncounters)
+                    past_encounters[match_id] = encounters
+
+        return pd.DataFrame([vars(m) for m in matches]), past_encounters
+
+    def __get_match_result(self, details):
+        result = 0
+        if details.HomeTeamGoal > details.AwayTeamGoal:
+            result = 1
+        elif details.AwayTeamGoal > details.HomeTeamGoal:
+            result = 2
+        return result
 
     def __calculate_team_score(self, attr):
         attributes = [attr.BuildUpPlaySpeed, attr.BuildUpPlayPassing, attr.ChanceCreationPassing,
@@ -156,3 +175,21 @@ class Preprocessor:
                 scored_goals = scored_goals + match.AwayTeamGoal
 
         return scored_goals
+
+    def __get_past_encounters(self, matches):
+        encounters = []
+        if matches:
+            for match in matches:
+                result = 0
+                if match.HomeTeamGoals > match.AwayTeamGoals:
+                    result = 1
+                elif match.AwayTeamGoals > match.HomeTeamGoals:
+                    result = 2
+
+                encounters.append(PastEncounter(home_team_id=match.HomeTeamId, away_team_id=match.AwayTeamId,
+                                                home_team_name=match.HomeTeamName, away_team_name=match.AwayTeamName,
+                                                match_date=match.Date, match_result=result))
+        else:
+            encounters.append(PastEncounter())
+
+        return pd.DataFrame([vars(e) for e in encounters])
