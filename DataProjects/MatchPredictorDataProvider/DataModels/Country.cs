@@ -9,7 +9,7 @@ namespace SoccerDataImporter.DatabaseModels
         {
             League = new HashSet<League>();
             Match = new HashSet<Match>();
-				EloRating = new HashSet<EloRating>();
+			EloRating = new HashSet<EloRating>();
 		}
 
         public int Id { get; set; }
