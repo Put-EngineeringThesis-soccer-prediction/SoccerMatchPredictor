@@ -4,9 +4,9 @@ from preprocessor import Preprocessor
 
 class DataAggregator:
 
-    def __init__(self):
-        self.preprocessor = Preprocessor()
-        self.data_fetcher = DataFetcher()
+    def __init__(self, preprocessor=Preprocessor(), data_fetcher=DataFetcher()):
+        self.preprocessor = preprocessor
+        self.data_fetcher = data_fetcher
 
     def get_data_for_seasons(self, seasons, params):
         data = []
