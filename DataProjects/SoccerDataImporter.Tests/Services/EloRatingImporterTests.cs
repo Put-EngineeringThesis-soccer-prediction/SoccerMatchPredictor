@@ -50,7 +50,7 @@ namespace SoccerDataImporter.Tests.Services
 			testDbContext.Team.Add(new Team { Id = 1, TeamApiId = 1, TeamFifaApiId = 1, TeamLongName = team.DbTeamName });
 			testDbContext.SaveChanges();
 
-			httpClientMock.Setup(x => x.GetEloRatingResposne(new Uri("http://api.clubelo.com/" + team.ApiTeamName)))
+			httpClientMock.Setup(x => x.GetEloRatingResponse(new Uri("http://api.clubelo.com/" + team.ApiTeamName)))
 				.ReturnsAsync(File.OpenRead(sourceFile));
 
 			await eloRatingImporter.ImportTeamEloRatingHistory(team, destination);
@@ -79,7 +79,7 @@ namespace SoccerDataImporter.Tests.Services
 			testDbContext.Team.Add(new Team { Id = 1, TeamApiId = 1, TeamFifaApiId = 1, TeamLongName = team.DbTeamName });
 			testDbContext.SaveChanges();
 
-			httpClientMock.Setup(x => x.GetEloRatingResposne(new Uri("http://api.clubelo.com/" + team.ApiTeamName)))
+			httpClientMock.Setup(x => x.GetEloRatingResponse(new Uri("http://api.clubelo.com/" + team.ApiTeamName)))
 				.ReturnsAsync(File.OpenRead(sourceFile));
 
 			await eloRatingImporter.ImportTeamEloRatingHistory(team, destination);
@@ -107,7 +107,7 @@ namespace SoccerDataImporter.Tests.Services
 			testDbContext.Team.Add(new Team { Id = 1, TeamApiId = 1, TeamFifaApiId = 1, TeamLongName = team.DbTeamName });
 			testDbContext.SaveChanges();
 
-			httpClientMock.Setup(x => x.GetEloRatingResposne(new Uri("http://api.clubelo.com/" + team.ApiTeamName)))
+			httpClientMock.Setup(x => x.GetEloRatingResponse(new Uri("http://api.clubelo.com/" + team.ApiTeamName)))
 				.ReturnsAsync(File.OpenRead(sourceFile));
 
 			await eloRatingImporter.ImportTeamEloRatingHistory(team, destination);

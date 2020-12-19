@@ -41,7 +41,7 @@ namespace SoccerDataImporter.Tests.Services
 		public async Task EloRatingHttpClientShouldMakeSingleRequest()
 		{
 			var testUri = new Uri("https://someUri.com");
-			await eloRatingHttpClient.GetEloRatingResposne(testUri);
+			await eloRatingHttpClient.GetEloRatingResponse(testUri);
 			handlerMock.Protected().Verify("SendAsync", Times.Exactly(1),
 				ItExpr.Is<HttpRequestMessage>(req => req.RequestUri == testUri),
 				ItExpr.IsAny<CancellationToken>());
