@@ -15,7 +15,7 @@ namespace SoccerDataImporter.Services
 			_client = client;
 		}
 
-		public async Task<Stream> GetEloRatingResposne(Uri requestUri)
+		public async Task<Stream> GetEloRatingResponse(Uri requestUri)
 		{
 			return await _client.GetStreamAsync(requestUri);
 		}

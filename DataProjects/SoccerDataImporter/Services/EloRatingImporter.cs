@@ -70,7 +70,7 @@ namespace SoccerDataImporter.Services
 			Directory.CreateDirectory(fileName.Substring(0, fileName.LastIndexOf("/")));
 			try
 			{
-				using (var responseStream = await _httpClient.GetEloRatingResposne(teamUri))
+				using (var responseStream = await _httpClient.GetEloRatingResponse(teamUri))
 				{
 					using (var fileStream = File.Create(fileName))
 					{

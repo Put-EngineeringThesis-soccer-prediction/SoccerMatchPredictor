@@ -6,6 +6,6 @@ namespace SoccerDataImporter.Interfaces
 {
 	public interface IEloRatingHttpClient
 	{
-		public Task<Stream> GetEloRatingResposne(Uri requestUri);
+		public Task<Stream> GetEloRatingResponse(Uri requestUri);
 	}
 }
