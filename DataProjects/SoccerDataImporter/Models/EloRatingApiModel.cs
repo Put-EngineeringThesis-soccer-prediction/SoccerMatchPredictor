@@ -16,7 +16,7 @@ namespace SoccerDataImporter.Models
 		public static EloRatingApiModel FromCsv(string csvLine)
 		{
 			string[] values = csvLine.Split(',');
-			if(values.Length < 7)
+			if (values.Length < 7)
 			{
 				return null;
 			}

@@ -17,8 +17,8 @@ namespace SoccerDataImporter.DatabaseModels
 		public virtual Team TeamApi { get; set; }
 		public virtual Country Country { get; set; }
 
-		public static EloRating GetDbFromEloRating(EloRatingApiModel apiModel, 
-			Team relevantTeam, 
+		public static EloRating GetDbFromEloRating(EloRatingApiModel apiModel,
+			Team relevantTeam,
 			Country relevantCountry,
 			int id)
 		{

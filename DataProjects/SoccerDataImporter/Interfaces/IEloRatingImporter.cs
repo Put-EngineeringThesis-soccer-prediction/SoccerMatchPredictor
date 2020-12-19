@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace SoccerDataImporter.Interfaces
 {
-	interface IEloRatingImporter
+	public interface IEloRatingImporter
 	{
 		Task ImportTeamEloRatingHistory(TeamsToImportSetting teamName, string destinationDirectory);
 	}

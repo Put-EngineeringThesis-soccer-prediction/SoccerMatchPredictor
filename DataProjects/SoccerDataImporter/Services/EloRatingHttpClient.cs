@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace SoccerDataImporter.Services
 {
-	class EloRatingHttpClient : IEloRatingHttpClient
+	public class EloRatingHttpClient : IEloRatingHttpClient
 	{
 		private readonly HttpClient _client;
+
 		public EloRatingHttpClient(HttpClient client)
 		{
 			_client = client;
