@@ -88,14 +88,14 @@ namespace MatchPredictorDataProvider.Services
 						await GetSeasonPlayedUntilToday(match.AwayTeamApiId, match.Date.Value)));
 				}
 
-				string idCombo = match.HomeTeamApi.Id > match.AwayTeamApi.Id ? 
-					$"{match.HomeTeamApi.Id}_{match.AwayTeamApi.Id}" : 
+				string idCombo = match.HomeTeamApi.Id > match.AwayTeamApi.Id ?
+					$"{match.HomeTeamApi.Id}_{match.AwayTeamApi.Id}" :
 					$"{match.AwayTeamApi.Id}_{match.HomeTeamApi.Id}";
 
 				if (!previousEncountersDict.ContainsKey(idCombo))
 				{
 					previousEncountersDict.Add(
-						idCombo, 
+						idCombo,
 						await FindPastEncountersSinceMatch(match.HomeTeamApi, match.AwayTeamApi, match.Date.Value));
 				}
 
@@ -125,15 +125,15 @@ namespace MatchPredictorDataProvider.Services
 
 		private async Task<List<EncounterHistoryDto>> FindPastEncountersSinceMatch(Team FirstTeam, Team SecondTeam, DateTime matchDate)
 		{
-			var encounters  = await _context.Match
+			var encounters = await _context.Match
 				.Where(x =>
 				((x.HomeTeamApiId == FirstTeam.TeamApiId && x.AwayTeamApiId == SecondTeam.TeamApiId) ||
-				(x.HomeTeamApiId == SecondTeam.TeamApiId && x.AwayTeamApiId == FirstTeam.TeamApiId)) && 
+				(x.HomeTeamApiId == SecondTeam.TeamApiId && x.AwayTeamApiId == FirstTeam.TeamApiId)) &&
 				x.Date < matchDate)
 				.OrderByDescending(x => x.Date)
 				.ToListAsync();
 			var result = new List<EncounterHistoryDto>();
-			foreach(var encounter in encounters)
+			foreach (var encounter in encounters)
 			{
 				var homeTeam = encounter.HomeTeamApiId == FirstTeam.TeamApiId ? FirstTeam : SecondTeam;
 				var awayTeam = encounter.AwayTeamApiId == FirstTeam.TeamApiId ? FirstTeam : SecondTeam;
@@ -155,12 +155,11 @@ namespace MatchPredictorDataProvider.Services
 		}
 
 		private async Task<TeamHistory> GetTeamMatchHistoryFromGivenMatch(
-			TeamDto requestedTeam, 
-			DateTime matchDate, 
-			int numberOfMatches, 
+			TeamDto requestedTeam,
+			DateTime matchDate,
+			int numberOfMatches,
 			List<Match> downloadedMatches)
 		{
-
 			List<Match> matchHistory = downloadedMatches
 				.Where(x => (x.HomeTeamApiId == requestedTeam.TeamApiId || x.AwayTeamApiId == requestedTeam.TeamApiId) && x.Date.Value < matchDate)
 				.OrderByDescending(x => x.Date)
@@ -258,20 +257,20 @@ namespace MatchPredictorDataProvider.Services
 				.Match
 				.Where(x => (x.HomeTeamApiId == teamApiId || x.AwayTeamApiId == teamApiId) && x.Season == seasonYears)
 				.ToListAsync();
-			if(matchesInLastSeason is null)
+			if (matchesInLastSeason is null)
 			{
 				return null;
 			}
 			int result = 0;
-			foreach(var match in matchesInLastSeason)
+			foreach (var match in matchesInLastSeason)
 			{
-				if(match.HomeTeamApiId == teamApiId)
+				if (match.HomeTeamApiId == teamApiId)
 				{
-					if(match.HomeTeamGoal > match.AwayTeamGoal)
+					if (match.HomeTeamGoal > match.AwayTeamGoal)
 					{
 						result += 3;
 					}
-					else if(match.HomeTeamGoal == match.AwayTeamGoal)
+					else if (match.HomeTeamGoal == match.AwayTeamGoal)
 					{
 						result += 1;
 					}
