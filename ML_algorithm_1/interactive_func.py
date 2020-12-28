@@ -81,53 +81,74 @@ class Interactive():
         self.dataset = prepare_dataset(all_seasons, self.list_of_parameters, str(data_path), add_direct = True, avg = avg, undersample = False, globalCS = False)
         self._get_teams_list_for_interactive()
 
-    def _get_data_for_model(self, date, home_team, away_team):
-        indexes = np.where(pd.to_datetime(self.dataset['match_date']) == pd.Timestamp(date))[0]
+    def _get_data_for_model(self, home_team, away_team):
         home_indexes = np.where(self.dataset['teams_names']['home_team_name'] == home_team)[0]
         away_indexes = np.where(self.dataset['teams_names']['away_team_name'] == away_team)[0]
-        for index in indexes:
-            if index in home_indexes and index in away_indexes:
-                break 
-        else:
-            print('\nNiestety, taki mecz się nie odbędzie.')
+        home_indexes = sorted(home_indexes, reverse = True)
+        away_indexes = sorted(away_indexes, reverse = True)
+        index = list(set(home_indexes).intersection(away_indexes))
+        if index == []:
+            print('\nNiestety, nie posiadamy w naszej bazie odpowiednich danych.')
             return []
-        return np.array(self.dataset['X'].iloc[index - 1])[0:]
+        return np.array(self.dataset['X'].iloc[index[-1] - 1])[0:]
 
-    def _check_teams(self, date):
-        teams = self.dataset['teams_names'][pd.to_datetime(self.dataset['match_date']) == pd.Timestamp(date)].iloc[:, [2,3]]
-        if teams.empty:
-            print("\nTego dnia mecze się nie odbędą")
-        else:
-            print(f"\nDrużyny które rozegrają mecze tej daty to: \n\n{teams}")
+    def dense_network(self, data):
+        model = get_model()
+        model.load_weights("net_weigths.h5")
+        y_probas_dense = np.stack([model(data) for sample in range(100)])
+        y_proba_dense = y_probas_dense.mean(axis=0)
+        text = f"\n\nDenseNetwork probability: {y_proba_dense[0]}"
+        result = np.argmax(y_proba_dense)
+        return result, text
 
-    
-    def compute_result(self, date, home_team = 'Manchester United', away_team = 'Bournemouth', model_str = 'DenseNetwork'):
-        self._check_teams(date)
-        data = self._get_data_for_model(date, home_team, away_team)
+    def svm(self, data):
+        scaler = StandardScaler()
+        with open('SVM_scaler.pkl', 'rb') as f:
+            scaler = pickle.load(f) 
+        with open('SVM.pkl', 'rb') as f:
+            model = pickle.load(f)
+        data = scaler.transform(data)
+        result = model.predict(data)[0]
+        return result 
+    def compute_result(self, home_team = 'Manchester United', away_team = 'Bournemouth', model_str = 'DenseNetwork'):
+        data = self._get_data_for_model(home_team, away_team)
         if data == []:
             return
 
         output = {0: 'Draw', 1: home_team, 2: away_team}
+
         if model_str == 'DenseNetwork':
             data = np.expand_dims(data, axis=0)
-            model = get_model()
-            model.load_weights("net_weigths.h5")
-            y_probas_dense = np.stack([model(data) for sample in range(100)])
-            y_proba_dense = y_probas_dense.mean(axis=0)
-            print(f"\n\nDenseNetwork probability: {y_proba_dense[0]}")
-            result = np.argmax(y_proba_dense)
+            result, text = self.dense_network(data)
+            print(text)
+            result_text = f"\n-------\nModel output: {output[result]}\n-------"
             
         elif model_str == 'SVM':
             data = np.expand_dims(data, axis=0)
-            scaler = StandardScaler()
-            with open('SVM_scaler.pkl', 'rb') as f:
-                scaler = pickle.load(f) 
-            with open('SVM.pkl', 'rb') as f:
-                model = pickle.load(f)
-                
-            data = scaler.transform(data)
-            result = model.predict(data)[0]
-        print(f"\n-------\nModel output: {output[result]}\n-------")
+            result = self.svm(data)
+            result_text = f"\n-------\nModel output: {output[result]}\n-------"
+                   
+        elif model_str == 'All':
+            data = np.expand_dims(data, axis=0)
+            result_list = list()
+            result, text = self.dense_network(data)
+            result_list.append(result)
+            result_list.append(self.svm(data))
+
+
+            values = list(Counter(result_list).values())
+            if len(values) >= 2 and values[0] == values[1]:
+                result_dict = dict()
+                for i, model in zip(result_list, self.model_list):
+                    result_dict[model] = output[int(i)]
+                result_text = f'Zbyt duża rozbieżność by zagregować wyniki, wybierz jeden model. {result_dict}'
+            else:
+                result = list(Counter(result_list).keys())[0]
+                result_text = f"\n-------\nModels output: {output[result]}\n-------"
+
+
+
+        print(result_text)
         return 
 
 
