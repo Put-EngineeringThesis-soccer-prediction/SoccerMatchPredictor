@@ -2,8 +2,8 @@ from dataset_operation import DatasetOp
 
 class BlockingSplit(DatasetOp):
     """This class splits dataset into blocks from one margin to next margin and make blocks as consecutive ones."""
-    def __init__(self, n_blocks = 3, train_split = 0.8, scoring = None):
-        super().__init__(n_blocks, train_split, scoring)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
     
     def generate_cv(self, X, y):
         self._compute_param_dict(len(X))

@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 import os
 from multipledispatch import dispatch
+from multi_imbalance.resampling.global_cs import GlobalCS
 
 
 @dispatch(int, str, int)
@@ -20,7 +21,7 @@ def get_direct_matches_by_id(match_id, all_data_past, avg):
     match['match_date'] = pd.to_datetime(match['match_date'])
     return match
 
-def data_unsample(X, y, id_):
+def data_undersample (X, y, id_):
     classes = Counter(y)
     
     df = pd.concat([id_, X, y], axis=1)
@@ -29,13 +30,17 @@ def data_unsample(X, y, id_):
     df_middle = df[df['match_result'] == classes.most_common()[1][0]]
     
     
-    df_majority_downsampled = resample(df_majority, 
+    df_majority_undersample = resample(df_majority, 
                                 replace=False,    # sample without replacement
                                 n_samples=len(df_middle),  # to match minority class
                                 random_state=1234) # reproducible results
-    df_downsampled = pd.concat([df_majority_downsampled, df_minority, df_middle])
-    df_downsampled = df_downsampled.sort_values(by=['match_id'])
-    return df_downsampled.iloc[:,1:-1], df_downsampled['match_result']
+    df_undersample = pd.concat([df_majority_undersample, df_minority, df_middle])
+    df_undersample = df_undersample.sort_values(by=['match_id'])
+    return df_undersample.iloc[:,1:-1], df_undersample['match_result']
+
+def data_equalize(X, y):
+    X, y = GlobalCS().fit_resample(np.copy(X), np.copy(y))
+    return pd.DataFrame(X), pd.Series(y)
 
 def add_direct_matches(dataset, data_path, avg):
     home_wins_list = list()
@@ -65,7 +70,7 @@ def add_direct_matches(dataset, data_path, avg):
     dataset['X'].loc[:, 'direct_draws'] = draws
     
 
-def prepare_dataset(data, list_of_parameters, data_path,  add_direct = False, avg = 3, unsample = True):
+def prepare_dataset(data, list_of_parameters, data_path,  add_direct = False, avg = 3, undersample  = True, globalCS = False):
     dataset = dict()
     #data.sort_values(by=['match_date'])
     dataset['match_id'] = data['match_id']
@@ -76,6 +81,9 @@ def prepare_dataset(data, list_of_parameters, data_path,  add_direct = False, av
     
     if add_direct:
         add_direct_matches(dataset, data_path, avg)
-    if unsample:
-        dataset['X'], dataset['y'] = data_unsample(dataset['X'], dataset['y'], dataset['match_id'])
+    if undersample:
+        dataset['X'], dataset['y'] = data_undersample(dataset['X'], dataset['y'], dataset['match_id'])
+    if globalCS:
+        dataset['X'], dataset['y'] = data_equalize(dataset['X'], dataset['y'])
+
     return dataset

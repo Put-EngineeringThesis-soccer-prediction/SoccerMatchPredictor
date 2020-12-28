@@ -11,30 +11,35 @@ class NoneTypeList(Exception):
 class DatasetOp(metaclass=abc.ABCMeta):
     """This class is a base class for dataset splitting."""
     
-    def __init__(self, n_blocks, train_split, scoring):
+    def __init__(self, *, n_blocks, train_split = 0.8, scoring = None):
         """Class init.        
         Parameters:
         ----------
             n_blocks : int, default = 3
                 Number of blocks to create. 
-            train_split : int, default = 0.8
-                Percent of train set ib block. Test split is the rest of the block.
+            train_split : int or float, default = 0.8
+                Percent of train set in block. Test split is the rest of the block.
+                If int ten define block size in spliting from start
             scoring : callable, default=None
                 A single callable to evaluate the predictions on the test set. 
+            block_size : int, default=None
+                Size of block to test in StartSplit
         """
         self.n_blocks = n_blocks
         self.train_split = train_split
         self.scoring = scoring
     
-    def _compute_param_dict(self, X_size, ceil = True):
+    def _compute_param_dict(self, X_size):
         """Method computes param dictionary for batching."""
         self.param_info_ = dict()
-        if ceil:
+        if isinstance(self.train_split, float):
             self.param_info_['block_size'] = int(np.ceil(X_size / self.n_blocks))
+            self.param_info_['train_size'] = int(self.param_info_['block_size'] * self.train_split)
+            self.param_info_['test_size'] = self.param_info_['block_size'] - self.param_info_['train_size']
         else:
-            self.param_info_['block_size'] = X_size // self.n_blocks
-        self.param_info_['train_size'] = int(self.param_info_['block_size'] * self.train_split)
-        self.param_info_['test_size'] = self.param_info_['block_size'] - self.param_info_['train_size']
+            self.param_info_['block_size'] = X_size - (self.n_blocks * self.train_split)
+            self.param_info_['train_size'] = int(self.param_info_['block_size'])
+            self.param_info_['test_size'] = self.train_split
         
     def evaluate_over_batches(self, model, X, y, X_team = None, y_team = None):
         """Method splits dataset into subset with a given logic.

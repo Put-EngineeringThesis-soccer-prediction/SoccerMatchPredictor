@@ -54,7 +54,7 @@ class Interactive():
         self.dataset = None
         self.list_of_parameters = LIST_OF_PARAMETERS
         self.lista = list()
-        self.model_list = ['DenseNetwork', "SVC"]
+        self.model_list = ['DenseNetwork', "SVM", "All"]
 
 
     def _get_teams_list_for_interactive(self):
@@ -68,17 +68,17 @@ class Interactive():
                                                          Season.y2012, Season.y2013, \
                                                          Season.y2014, Season.y2015, Season.y2016], \
                                                          Parameters(no_last_matches=last_matches))
-        self.dataset = prepare_dataset(all_data, self.list_of_parameters, all_data_past, add_direct = True, avg = 3, unsample = False)
+        self.dataset = prepare_dataset(all_data, self.list_of_parameters, all_data_past, add_direct = True, avg = 3, undersample = False, globalCS = False)
         self._get_teams_list_for_interactive()
 
-    def get_data_from_local(self, *, name = 'all_seasons.csv', data_dir = 'Dane', avg = 3):
+    def get_data_from_local(self, *, name = 'all_seasons_3.csv', data_dir = 'Dane', avg = 3):
         warnings.simplefilter("ignore")
         working_dir = Path(os.getcwd()).parent
         data_path = os.path.join(working_dir.parent, data_dir)
         all_seasons = pd.read_csv(os.path.join(data_path, name), index_col=0) 
         all_seasons['match_date'] = pd.to_datetime(all_seasons['match_date'])
 
-        self.dataset = prepare_dataset(all_seasons, self.list_of_parameters, str(data_path), add_direct = True, avg = avg, unsample = False)
+        self.dataset = prepare_dataset(all_seasons, self.list_of_parameters, str(data_path), add_direct = True, avg = avg, undersample = False, globalCS = False)
         self._get_teams_list_for_interactive()
 
     def _get_data_for_model(self, date, home_team, away_team):
@@ -117,12 +117,12 @@ class Interactive():
             print(f"\n\nDenseNetwork probability: {y_proba_dense[0]}")
             result = np.argmax(y_proba_dense)
             
-        elif model_str == 'SVC':
+        elif model_str == 'SVM':
             data = np.expand_dims(data, axis=0)
             scaler = StandardScaler()
-            with open('SVC_scaler.pkl', 'rb') as f:
+            with open('SVM_scaler.pkl', 'rb') as f:
                 scaler = pickle.load(f) 
-            with open('SVC.pkl', 'rb') as f:
+            with open('SVM.pkl', 'rb') as f:
                 model = pickle.load(f)
                 
             data = scaler.transform(data)
