@@ -1,33 +1,58 @@
 
 \chapter{Przegląd badań na temat eksploracji danych sportowych oraz pojęcia podstawowe}
+Temat eksploracji danych sportowych i wykorzystania metod z dziedziny uczenia maszynowego w sporcie rozwinął się znacząco w ostatnich latach. Świadczą o tym chociażby organizowane corocznie konferencje poświęcone szeroko rozumianej analizie sportu, takie jak MLSA (\textit{Machine Learning and Data Mining for Sports Analytics}) przeprowadzane co roku w innym kraju, czy \textit{MIT Sloan Sports Analytics Conference}, która ma miejsce w Stanach Zjednoczonych. Konferencje te zrzeszają nie tylko naukowców i badaczy, ale też trenerów, działaczy klubów, a nawet samych zawodników.
 
-Rozdział tzw. state of the related research --- przegląd literatury naświetlający stan wiedzy na dany temat oraz pojecia zwiazane z tym co bedziecie wykorzystaywac
+W przeszłości prace naukowe dotyczące piłki nożnej pojawiały się rzadziej od prac traktujących o innych dyscyplinach sportowych~\cite{ml_soccer_analytics}. Wynika to z zupełnie innej natury tego sportu. Jak wspomniano w pracy~\cite{game_classification}, piłka nożna należy do sportu z kategorii terytorialnych (\english{territory games}), które zakładają kontrolę pewnego obiektu, trzymanie go z dala od przeciwnika i stopniowego przesuwania się do pozycji, która pozwoli zdobyć punkt/bramkę. Zawodnicy zarówno defensywni, jak i ofensywni zajmują ten sam obszar boiska próbując jednocześnie uniemożliwić zdobycie punktów przez przeciwnika. Taki styl gry różni się nieco od np. baseballu, który należy do kategorii określonej jako \textit{Striking/Fielding} i charakteryzuje się zdobywaniem punktu poprzez wykonanie rzutu i biegnięcie do wyznaczonego miejsca lub uniemożliwieniem zdobycia punktu przez przeciwnika poprzez przechwycenie tego rzutu. Mając na uwadze różnice w stylach tych dyscyplin, można zauważyć, iż łatwiej jest rozbić pojedynczy mecz w baseballu na dyskretne wydarzenia do analizy, a dynamiczna i skomplikowana struktura piłki nożnej czyni taką analizę znacznie trudniejszą.
 
-\textbf{Dodajcie jakis wstepny podrozdzial opisujace dokladniej wybrane zastosowania ML w analizie rozgrywek sportowych - glownie czym sie zajmuja badacze, jakie problemy teoretyczne i praktyczne badali + jakie byly typy rozgrywek - to w jakis sposob robiliscie iles miesiecy temu w ramach tzw. przegladu na google docs}
-Na koncu musiecie cos powiedziec ze Wasze plany systemu wiaza sie z koniecznoscia odwolanie sie do repozytoriów danych, pozyskania ich oraz wstepnego przetworzenia - dlatego dalej 
+Potrzeba dostępu do szczegółowych i wyrafinowanych analiz meczów piłki nożnej spowodowała powstanie wielu komercyjnych firm takich jak \textit{Wyscout} czy \textit{StatsBomb}, które dostarczają wyszukanych analiz wideo dzielących każde mecze na czynniki pierwsze przy pomocy technik rozpoznawania obrazów (\english{computer vision}) i uwzględniają niewidoczne dla ludzkiego oka szczegóły- dokładną pozycję bramkarza w momencie utraty bramki, siłę strzału, pozycję zawodnika, od którego rozpoczęła się akcja bramkowa itd.
+
+Mimo, iż techniki uczenia maszynowego w sporcie (a w szczególności w piłce nożnej) są najczęściej wykorzystywane w celu przewidywania zwycięzcy spotkania (chociażby prace z ostatniego dużego turnieju europejskiego - Euro 2016~\cite{Euro2016-1} \cite{Euro2016-2} \cite{Euro2016-3}), wiele dzieł dotyczy także innych zagadnień. Podejmowane są przykładowo tematy ewaluacji umiejętności danego zawodnika (oraz jego szans na dalszy rozwój) i całej drużyny~\cite{ml_soccer_analytics} \cite{soccer_players_skill}, które mogą potencjalnie wspomóc łowców talentów szukających nowych zawodników do drużyn, czy też automatycznego wykrywania ludzkiej aktywności ruchowej~\cite{activity_recignition}, które może umożliwić na przykład znalezienie optymalnych pozycji zawodników do wykonywania strzału, podania czy sprintu.
+
+Zrealizowanie celu tej pracy, który zakłada zbudowanie systemu przewidującego wyniki meczów piłkarskich z ligi angielskiej, wymaga dostępu do dużej ilości danych danych znajdujących się w wielu repozytoriach. Z uwagi na wspomnianą popularność tej dyscypliny oraz zainteresowanie nią analityków, dostęp do tych danych nie stanowi problemu.
 
 \section{Bazy danych i API}
-Opisy relacyjnych baz danych i Web API
+Podstawą uczenia maszynowego są dane na których algorytmy mogą się uczyć, dlatego jednym z postawionych problemów było miejsce przechowywania danych jak i sposób ich pobierania.
+
+Relacyjne bazy danych (\english{Relational databases, RBD}), których postulaty pojawiły się po raz pierwszy w artykule Edwarda Franka Codd'a \cite{Codd}, są podstawą dla wielu systemów informatycznych, mimo zwiększającej się popularności innych metod przechowywania danych, takich jak NoSQL \cite{RBD_popularity_2016}. Również w obszarze uczenia maszynowego można zauważyć dominującą popularność systemów relacyjnych baz danych. Według ankiety przeprowadzonej przez \textit{Kaggle.com}, trzy najczęściej wybierane bazy danych to relacyjne bazy danych, takie jak \textit{Microsoft SQL Server} \cite{RDB_popularity_kaggle_2020}.
+
+RBD jest zbiorem tabel, z których każda ma za zadanie reprezentować różne encje (\english{entity}), ma przedstawiać część rzeczywistości. W tabelach występują rzędy oraz kolumny. Rzędy to instancje, które przedstawiają konkretne wystąpienie danej encji, a kolumny to ich atrybuty, które reprezentują cechy opisywanej części rzeczywistości. 
+
+\begin{figure}[h] 
+        \centering\includegraphics[width=14cm,height=10cm]{figures/Example_entities.PNG}
+        \caption{Przykładowych schemat relacji encji relacyjnej bazy danych.}\label{example-Entity}
+\end{figure}
+
+Powodem dla którego nazywamy to relacyjną bazą danych jest możliwość wstawienia odnośnika do kolumny, który wskazuje na rząd w innej tabeli. Patrząc na przykładowy schemat \ref{example-Entity}, można zauważyć, że kolumny \textit{TeamA\_Id} oraz \textit{TeamB\_Id} z tabeli \textit{Mecz}, odnoszą się do wartości w tabeli \textit{Drużyna}. Wartości w kolumnach, odwołujące się do innych tabel nazywamy \textit{kluczami obcymi}. \cite{Relational_Databases_Milan}
+
+Obecnie istnieje duża ilość oprogramowania, umożliwiającego zarządzanie takimi bazami danych, np. \textit{Microsoft SQL Server} czy \textit{PostgreSql}, lecz wszystkie sprowadzają się do standardu ISO \cite{SQL_ISO}. Zdefiniowane są tam jaką RBD powinny mieć strukturę oraz jakie typy danych zawierają. W pracy zostały użyte z względu na łatwość dostępu do narzędzi oraz możliwości utworzenia instancji na chmurze, korzystając z Azure Cloud.
+
+Część Web APi
+
 \section{Wstępne przetwarzanie i wizualizacja danych}
 
 \noindent 
 
 Jednym z kluczowych aspektów mocno wpływających na powodzenie każdego projektu związanego z uczeniem maszynowym jest stworzenie odpowiedniego zbioru cech (\english{features}) na podstawie poprawnie przygotowanych danych. W kontekście uczenia maszynowego, cecha to indywidualna, mierzalna własność lub charakterystyka pewnego obserwowanego zjawiska~\cite{Wiki:Feature}. W przypadku modelu przewidującego wyniki meczów piłkarskich, przykładem cechy może być liczba żółtych kartek uzyskanych przez drużynę gospodarzy w ostatnim meczu lub średni procent posiadania piłki drużyny gości w meczach obecnego sezonu.
 
-Metody zbioru danych są bardzo często automatyzowane i pozbawione ścisłej kontroli, stąd mogą one zawierać różnego rodzaju błędy, takie jak wartości spoza zakresu (np. wiek: -20), niemożliwe kombinacje wartości (płeć: mężczyzna, w ciąży: tak) lub pominięte atrybuty dla niektórych rekordów. Ważne jest, aby takie błędy wychwycić już na etapie wstępnego przetwarzania i nie dopuścić ich do danych wejściowych algorytmów. Pomocna może się tutaj okazać wizualizacja dokonana w celu bliższego zapoznania się z danymi. Dla atrybutów można wizualizować ich wartości przy pomocy histogramów lub wypisywać ich podstawowe statystyki (m.in. średnie, mediany, wartości minimalne, maksymalne) w celu weryfikacji poprawności ich zakresów i typów.
+Metody zbioru danych są bardzo często automatyzowane i pozbawione ścisłej kontroli, stąd mogą one zawierać różnego rodzaju błędy, takie jak wartości spoza zakresu (np. wiek: -20), niemożliwe kombinacje wartości (płeć: mężczyzna, w ciąży: tak) lub pominięte atrybuty dla niektórych rekordów. Ważne jest, aby takie błędy wychwycić już na etapie wstępnego przetwarzania i nie dopuścić ich do danych wejściowych algorytmów. Pomocna może się tutaj okazać wizualizacja dokonana w celu bliższego zapoznania się z danymi. Dla atrybutów można wizualizować rozkład ich wartości przy pomocy histogramów lub wypisywać ich podstawowe statystyki (m.in. średnie, mediany, wartości minimalne, maksymalne) w celu weryfikacji poprawności ich zakresów i typów.
 
 System będzie w stanie nauczyć się przewidywać wyniki tylko mając do dyspozycji jak najwięcej znaczących cech i jak najmniej tych mało znaczących. Zgodnie z popularnym angielskim zwrotem w obszarze przetwarzania informacji-  \definicja{śmieci na wejściu – śmieci na wyjściu} (\english{Garbage In, Garbage Out, GIGO}), nawet skuteczny i poprawnie działający program w przypadku otrzymania na wejściu błędnych danych, da na wyjściu niepoprawne oraz mało użyteczne wyniki, stąd tak ważne jest uprzednie przygotowanie danych.
 
-Wstępne przetwarzanie (\english{preprocessing}) w naszym systemie składa się z jednorazowego dokonania wizualizacji posiadanych przez nas danych (która będzie szczegółowo przedstawiona w późniejszym rozdziale) w celu pogłębienia wiedzy na ich temat i wyszukania potencjalnych braków lub błędów. Następnym zadaniem, wykonywanym każdorazowo przy tworzeniu zbioru danych, którego przeznaczeniem jest użycie podczas testowania różnego rodzaju algorytmów, jest pobranie interesujących danych z bazy, przetworzenie ich, czyli poradzenie sobie z m.in. wartościami pustymi i stworzenie na ich podstawie zbioru cech reprezentujących każdy rekord (w przypadku naszego systemu jest to pojedynczy mecz). 
+Wstępne przetwarzanie (\english{preprocessing}) w naszym systemie składa się z jednorazowego dokonania wizualizacji posiadanych przez nas danych (która będzie szczegółowo przedstawiona w późniejszym rozdziale) w celu pogłębienia wiedzy na ich temat i wyszukania potencjalnych braków lub błędów. Następnym zadaniem, wykonywanym każdorazowo przy tworzeniu zbioru danych, którego przeznaczeniem jest użycie podczas testowania różnego rodzaju algorytmów, jest pobranie interesujących danych z bazy, przetworzenie ich, czyli poradzenie sobie z m.in. wartościami pustymi i stworzenie na ich podstawie wektora cech dla każdego rekordu (w przypadku naszego systemu jest to pojedynczy mecz). 
 
 Wynikiem etapu wstępnego przetwarzania jest tzw. zbiór treningowy (\english{training set}), którego znaczenie zostanie przybliżone w podrozdziale traktującym o algorytmach uczenia maszynowego.
 
 \section{Sposób oceny wyników predykcji}
+\label{section:ocenaWynikow}
 
-Różne algorytmy dają różne wyniki. Przy pomocy jednych uzyskujemy tylko konkretną klasę, do której przynależy konkretne wejście, a inne przyporządkowują rozkład prawdopodobieństwa możliwych wyników klasyfikacji. W naszym przypadku, mamy do czynienia z obiema sytuacjami. Podczas doboru sposobu oceny naszych algorytmów głównym celem było dobranie takich miar, aby móc wzajemnie porównywać zastosowane algorytmy i na tej podstawie dobrać najlepsze podejście. Ocena jakości naszych rozwiązań opierała się zatem na policzeniu dokładności (\english{accuracy}) na zbiorze testowym (wynoszącym 10\% całego zbioru danych), macierzy pomyłek oraz wynikające z nich miary takie jak: precision, recall oraz F-score, które wyznaczyliśmy przy użyciu średniej typu „macro” (oblicza metryki dla każdej etykiety, a następnie wyznacza ich nieważoną średnią. Metoda ta nie uwzględnia niezbalansowania danych).
+Różne algorytmy dają wyniki w różnych formatach. Przy pomocy jednych uzyskujemy tylko konkretną klasę, do której przynależy konkretne wejście, a inne przyporządkowują rozkład prawdopodobieństwa możliwych wyników klasyfikacji. W naszym przypadku, mamy do czynienia z obiema sytuacjami. Podczas doboru sposobu oceny naszych algorytmów głównym celem było dobranie takich miar, aby móc wzajemnie porównywać zastosowane algorytmy i na tej podstawie dobrać najlepsze podejście. Ocena jakości naszych rozwiązań opierała się zatem na policzeniu \definicja{dokładności} (\english{accuracy}) na zbiorze testowym (wynoszącym 10\% całego zbioru danych), macierzy pomyłek oraz wynikające z niej miary takie jak: \definicja{precyzja} (\english{precision}, interpretujemy jako stosunek tp / (tp + fp), gdzie tp to liczba poprawnie sklasyfikowanych przykładów, a fp to liczba niepoprawnie sklasyfikowanych przykładów.), \definicja{czułość} (\english{recall}, interpretujemy jako stosunek tp / (tp + fn), gdzie tp jest liczbą poprawnie sklasyfikowanych przykładów, a fn liczbą niepoprawnie sklasyfikowanych przykładów.) oraz \definicja{F-score} (\definicja{F-score} interpretuje się jako ważoną średnią harmoniczną precyzji i czułości, gdzie wynik \definicja{F-score} osiąga najwyższą wartość przy 1, a najniższą przy 0), którą wyznaczyliśmy przy użyciu średniej typu „macro” (oblicza metryki dla każdej etykiety, a następnie wyznacza ich nieważoną średnią. Metoda ta nie uwzględnia niezbalansowania danych) \cite{SKfscore}. Dodatkowo do porównania zastosowaliśmy macierz pomyłek, której schemat można zobaczyć w tabeli \ref{tab:macierz}
 
 \begin{center}
+\begin{table}
 \renewcommand{\arraystretch}{1.5}
+\caption{Macierz pomyłek dla naszego problemu klasyfikacji}
+\label{tab:macierz}
+\begin{center}
 \begin{tabular}{|c|c|c|c|c|}
    \cline{3-5} 
    \multicolumn{1}{c}{} & & \multicolumn{3}{c|}{Predicted} \\ \cline{3-5}
@@ -39,8 +64,10 @@ Różne algorytmy dają różne wyniki. Przy pomocy jednych uzyskujemy tylko kon
    & AwayWin & .. & .. & .. \\ \hline
 \end{tabular}
 \end{center}
-Dodatkowo przetestowaliśmy nasze algorytmy w sposób, w którym dane wejściowe podzieliliśmy na bloki następujące po sobie. Następnie wyuczyliśmy nasz algorytm na pierwszym bloku i testowaliśmy jego działanie na mniejszym bloku, który w zbiorze danych wstępował zaraz po bloku uczącym. Kolejno do dotychczasowego zbioru uczącego dołożyliśmy dane z poprzedniego bloku testowego i na podstawie nowego zbioru znów dokonaliśmy uczenia maszynowego by następnie dokonać ewaluacji na kolejnym fragmencie zbioru testowego. Proces ten powtarzaliśmy, aż do wykorzystania wszystkich dostępnych i przygotowanych danych.
-\newpage
+\end{table}
+\end{center}
+
+Dodatkowo przetestowaliśmy nasze algorytmy w sposób, w którym dane wejściowe podzieliliśmy na bloki następujące po sobie. Następnie wyuczyliśmy nasz algorytm na pierwszym bloku i testowaliśmy jego działanie na mniejszym bloku, który w zbiorze danych występował zaraz po bloku uczącym. Kolejno do dotychczasowego zbioru uczącego dołożyliśmy dane z poprzedniego bloku testowego i na podstawie nowego zbioru znów dokonaliśmy uczenia maszynowego by następnie dokonać ewaluacji na kolejnym fragmencie zbioru testowego. Proces ten powtarzaliśmy, aż do wykorzystania wszystkich dostępnych i przygotowanych danych.
 
 \section{Algorytmy uczenia maszynowego}
 opisy teoretyczne wykorzystywanych algorytmów
@@ -54,7 +81,7 @@ adresy stron internetowych w przypadku źródeł pochodzących z Internetu.
 
 
 \subsection{Metoda Wektorów Wspierających - SVM}
-\definicja{Metoda wektorów wspierających - nośnych} (\english{Support Vector Machine, SVM}), jest to nadzorowana technika uczenia maszynowego wykorzystywana do zadań klasyfikacji oraz regresji. Technika ta została opracowana w laboratorium AT\&T Bell poprzez Vladimira Naumovicha Vapnika wraz z współpracownikami (Boser i in., 1992, Guyon i in., 1993, Vapnik i in., 1997). \cite{Wiki:SVM}. Głównym założeniem tej metody jest wyznaczenie hiperpłaszczyzny, która ma za zadanie rozdzielić przy pomocy maksymalnego marginesu przykłady należące do różnych klas. W przypadku występowania więcej niż dwóch klas, metoda ta wykorzystuję technikę \definicja{OvR} (\english{One-vs-Rest}), która polega na szkoleniu jednego klasyfikatora na klasę, z próbkami z tej klasy jako pozytywne próbki, a inne próbki jako negatywy. Formalnie problem klasyfikacji przedstawia się następująco \cite{Prezentacja:SVM2}: 
+\definicja{Metoda wektorów wspierających - nośnych} (\english{Support Vector Machine, SVM}), jest to nadzorowana technika uczenia maszynowego wykorzystywana do zadań klasyfikacji oraz regresji. Technika ta została opracowana w laboratorium AT\&T Bell poprzez Vladimira Naumovicha Vapnika wraz ze współpracownikami (Boser i in., 1992, Guyon i in., 1993, Vapnik i in., 1997). \cite{Wiki:SVM}. Głównym założeniem tej metody jest wyznaczenie hiperpłaszczyzny, która ma za zadanie rozdzielić przy pomocy maksymalnego marginesu przykłady należące do różnych klas. W przypadku występowania więcej niż dwóch klas, metoda ta wykorzystuję technikę \definicja{OvR} (\english{One-vs-Rest}), która polega na szkoleniu jednego klasyfikatora na klasę, z próbkami z tej klasy jako pozytywne próbki, a inne próbki jako negatywy. Formalnie problem klasyfikacji przedstawia się następująco \cite{Prezentacja:SVM2}: 
 \begin{itemize}
     \item W przestrzeni danych (ang. measurement space) $\omega$ znajdują się wektory danych x stanowiące próbkę uczącą D, należące do dwóch klas\\
     \begin{equation}

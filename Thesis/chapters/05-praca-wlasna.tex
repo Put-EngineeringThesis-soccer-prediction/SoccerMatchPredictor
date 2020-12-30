@@ -9,10 +9,100 @@
     \section{Wstępne przetwarzanie}
         \subsection{Pobieranie danych z serwera}
         \subsection{Tworzenie zbioru cech}
+        Zbiór cech jest jednym z kluczowych czynników, które wpływają na jakość algorytmów uczenia maszynowego. Odpowiedni dobór oraz selekcja i segregacja to dobra drogo do uzyskania dobrej predykcji. Jednak wybór odpowiednich cech nie jest łatwym zadaniem i zazwyczaj zajmuje on dużo czasu i zasobów. Także w naszym problemie, dobór cech był starannie dokonany. Piłka nożna do bardzo rozbudowana gra i z jednej partii między drużynami można wyciągnąć nieskończoną ilość danych, poprzez najbardziej oczywiste jak liczba strzałów, po te mniej jak ilość minut spędzonych na swojej połowie przez danego gracza lub średni wiek piłkarza w danej drużynie. Z racji, że posiadaliśmy dość rozbudowaną bazę pochodzącą z różnych źródeł, ostatecznie wybraliśmy 30 cech, które odpowiednio zagregowaliśmy a następnie przekazaliśmy na wejście naszych algorytmów uczenia maszynowego. Lista tych cech wraz z ich krótkim wyjaśnieniem: .
+        
+        \begin{itemize}
+            \item avg\_away\_win\_odds, avg\_home\_win\_odds, avg\_draw\_odds: średnia wartość kursów oferowanych na zwycięstwo danej drużyny, remis oraz wygraną drugiej drużyny,
+            \item home\_elo\_rating, away\_elo\_rating: ELO rating dla obu drużyn,
+            \item home\_players\_avg\_age, away\_players\_avg\_age: średni wiek graczy w drużynach, 
+            \item home\_players\_avg\_rating, away\_players\_avg\_rating: zagregowana siła zawodników danej drużyny (statystyki z gry Fifa takie jak: drybling, kontrola piłki, strzały z daleka ...), 
+            \item home\_team\_score, away\_team\_score: siła drużyny (statystyki z gry Fifa takie jak: szybkość, budowania ataku, ilość wymienianych podań ...), 
+            \item home\_avg\_corners, away\_avg\_corners: średnia liczba rzutów rożnych na mecz danej drużyny w ciągu ostatnich 3 meczów, 
+            \item home\_avg\_shots, away\_avg\_shots: średnia liczba oddanych strzałów na mecz danej drużyny w ciągu ostatnich 3 meczów, 
+            \item home\_won\_games, away\_won\_games: liczba wygranych przez drużynę spotkań z ostatnich 3 meczów, 
+            \item home\_tied\_games, away\_tied\_games: liczba remisów w ostatnich 3 meczach, 
+            \item home\_lost\_games, away\_lost\_games: liczba przegranych w ostatnich 3 meczach, 
+            \item home\_scored\_goals, away\_scored\_goals: liczba strzelonych przez drużynę goli w ostatnich 3 meczach, 
+            \item home\_team\_last\_season\_points, away\_team\_last\_season\_ponits: zdobyte punkty przez drużynę w ostatnim sezonie, 
+            \item home\_team\_seasons\_played, away\_team\_seasons\_played: liczba sezonów, które dana drużyna gra w Premier League, 
+            \item home\_direct\_wins: liczba zwycięstw drużyny gospodarza nad drużyną gościa w ostatnich meczach rozgrywanych przeciwko sobie,
+            \item away\_direct\_wins: liczba zwycięstw drużyny gościa nad drużyną gospodarza w ostatnich meczach rozgrywanych przeciwko sobie, 
+            \item direct\_draws: liczba remisów drużyny gościa z drużyną gospodarzy w ostatnich meczach rozgrywanych przeciwko sobie. 
+
+
+        \end{itemize}   
+        
         \subsection{Agregacja danych}
         \subsection{Testowanie jednostkowe}
     \section{Algorytmy}
-        \subsection{Alg1}
-        \subsection{Alg2}
+    Po przetworzeniu danych i ich przygotowaniu kolejnym krokiem w realizacji naszego projektu jest dostosowanie wydajnych algorytmów. W tej sekcji zaprezentujemy własne rozwiązania dla postawionego przez nas zadania. Przedstawimy kolejno cztery algorytmy, które wypróbowaliśmy i dały rzetelne rezultaty. Pokażemy ich strukturę oraz parametry dobrane w taki sposób by maksymalizować jakość naszego rozwiązania oraz osiągane wyniki.
+        \subsection{Sztuczna Sieć Neuronowa - SNN}
+        Pierwszym podejściem, które zaprezentujemy jest zbudowana przez nas na potrzeby zadania sztuczna sieć neuronowa. Przechodząc do budowy sieci, która zastosowaliśmy możemy ją opisać jako jednokierunkowa, sekwencyjna sieć posiadająca dwie warstwy ukryte, warstwę wejściową i wyjściową. Po każdej warstwie poza wyjściową, użyta jest warstwa normalizacji wsadowej (\english{BatchNormalization}) \cite{BatchNormalization}. Dodatkowo po pierwszej (i tylko po niej) zastosowaliśmy technikę Monte Carlo wraz z losowym porzucaniem połączeń pomiędzy neuronami (\english{Monte Carlo (MC) Dropout}) \cite{MCDropout} \cite{Dropout} \cite{Dropout2}. W pierwszej warstwie, warstwie wejściowej zastosowaliśmy 40 neuronów, które przepuszczją swoją kombinację danych wejściowych przez funkcję aktywacji \definicja{relu}: \[ReLU(x) = max(0, x)\] co sprawia, że funkcja na wyjściu przekazuje wartości nieujemne. Kolejno w warstwie \definicja{MCDropout} ustawiliśmy współczynnik porzucania równy 0.3. Następna warstwa ukryta składała się z 40 neuronów i funkcji aktywacji \definicja{selu} \cite{SELU} a jej formuła ma się następująco:
+        \[
+        SELU(x) = \lambda
+        \begin{cases}
+            x &  \text{if}\ x > 0\\
+            \alpha e^{x} - \alpha &  \text{if}\ x \le 0
+        \end{cases}
+        \]
+        gdzie:
+        \begin{center}
+            $\alpha \approx 1.6732632423543772848170429916717$ \\ 
+            $\lambda \approx 1.0507009873554804934193349852946$
+        \end{center}
+        Następnie w warstwie ukrytej również zastosowaliśmy funkcję aktywacji \definicja{selu}, lecz tym razem umieściliśmy zaledwie 5 neuronów. Wasrtwa wyjściowa składała się z ilości neuronów odpowiadającej ilości klas równej 3 (Draw, HomeWin, AwayWin), a funkcja aktywacji to funkcja \definicja{softmax}:
+        \[
+        \hat{p}_{k} = \sigma(s(x))_{k} = \frac{exp \big(s_{k}(x)\big)}{\sum_{j=1}^{K}exp \big(s_{j}(x)\big)}
+        \]
+        gdzie:
+        \begin{itemize}
+            \item K to liczba klas,
+            \item s(x) to wektor zawierający wyniki każdej klasy dla instancji x,
+            \item $\sigma(s(x))_{k}$ jest szacowanym prawdopodobieństwem, że instancja x należy do klasy k, biorąc pod uwagę wyniki każdej klasy dla tej instancji.
+        \end{itemize}
+        Model sekwencyjny uczyliśmy przy pomocy optymalizatora \definicja{nadam} \cite{adam} \cite{nadam} wraz z funkcją straty \definicja{sparse categorical corossentropy}. Wstępnie ustawiliśmy 80 epok, które miały za zadanie uzyskać najlepszy wynik dla naszego problemu, jednak wczesne zatrzymywanie (\english{early stopping}) pozwoliło na zatrzymanie treningu już na dwudziestej pierwszej epoce chroniąc nasz model przed przeuczeniem (\english{overfitting}).
+        
+        Po treningu, w celu testowania i predykcji wyników, zastosowana warstwa \definicja{MCDropout} pozwala na kontynuowanie porzucania nawet w fazie po treningowej (w przeciwieństwie do podstawowej techniki \definicja{Dropout}, która po nauczeniu sieci, w fazie testowania nie porzucała neuronów - nie spełniała już żadnej funkcji) i dzięki temu zastosowaliśmy technikę, w której nowy przykład, którego klasę chcemy przewidzieć, jest przepuszczany przez sieć 100 razy, każdy wynik z poszczególnego przebiegu jest przechowywany, a następnie uśredniany dla każdej z możliwych klas. Po tej operacji posiadaliśmy bardziej rzetelne wyniki, które przełożyły się na lepsze rezultaty na zbiorze testowym.
+        
+        Schemat sieci można przedstawić w postaci tabeli \ref{tab:SNNTable}
+        \begin{table}[H]
+            \centering
+            \caption{Schemat SNN}
+            \label{tab:SNNTable}
+            \begin{tabular}{|c|c|c|}
+            \hline
+                Layer (type) &  Output Shape & Param \#\\ \hline \hline
+                dense (Dense) & (None, 40) & 1240 \\ \hline
+                batch\_normalization (BatchNormalization) & (None, 40) & 160 \\ \hline 
+                mc\_dropout (MCDropout) & (None, 40) & 0 \\ \hline         
+                dense\_1 (Dense) & (None, 40) & 1640 \\ \hline      
+                batch\_normalization\_1 (BatchNormalization) & (None, 40) & 160 \\ \hline
+                dense\_2 (Dense) & (None, 5) &  205 \\ \hline       
+                batch\_normalization\_2 (BatchNormalization)  & (None, 5) &  20 \\ \hline
+                dense\_3 (Dense) & (None, 3) &  18 \\ \hline \hline 
+            \end{tabular}
+            	\begin{tabular} {| c |}
+                Total params: 3,443 \\
+                Trainable params: 3,273 \\
+                Non-trainable params: 170 \\
+                \hline
+                \end{tabular}
+        \end{table}
+        \subsection{SVM}
+        Kolejnym podejściem, które braliśmy pod uwagę i testowaliśmy, był algorytm \definicja{SVM}. W podejściu tym skupiliśmy się na znalezieniu trzech najlepszych parametrów (C, $\gamma$, jądro (\english{kernel})). W celu znalezienia tych parametrów, zastosowaliśmy technikę losowego przeszukiwania siatki (\english{Randomized Search CV}) \cite{SKcv}, której jako punkt odniesienia zaaplikowaliśmy metrykę \definicja{f1\_macro} \cite{SKf1}. Zbiór walidacyjny potrzebny do szacowania wyników oraz porównywania dobranych parametrów podczas szukania, został przedstawiony w sekcji \ref{section:ocenaWynikow} i dotyczył on dzielenia zbioru danych na następujące po sobie bloki.
+        
+        Po fazie przeszukiwania, wybrane zostały najlepsze parametry, które przedstawiają się następująco:
+        \begin{table}[H]
+            \centering
+             \caption{Parametry SVM}
+            \label{tab:my_label}
+            \begin{tabular}{| c c |}
+            \hline
+                 Parametr & wartość \\ \hline \hline
+                 C & 3.560291686892903 \\ \hline
+                 $\gamma$ & 0.0030492848805430566 \\ \hline
+                 jądro & rbf \\ \hline
+            \end{tabular}
+        \end{table}
         \subsection{Alg3}
         \subsection{Alg4}
