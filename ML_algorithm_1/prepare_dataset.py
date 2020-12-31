@@ -7,7 +7,13 @@ from pathlib import Path
 import os
 from multipledispatch import dispatch
 from multi_imbalance.resampling.global_cs import GlobalCS
+import warnings
 
+class BadSplitSize(Exception):
+    """Raise an error if test_size is incorrect."""
+    def __init__(self, message = None, errors = None):
+        super().__init__(message)
+        self.errors = errors
 
 @dispatch(int, str, int)
 def get_direct_matches_by_id(match_id, data_path, avg):
@@ -70,7 +76,8 @@ def add_direct_matches(dataset, data_path, avg):
     dataset['X'].loc[:, 'direct_draws'] = draws
     
 
-def prepare_dataset(data, list_of_parameters, data_path,  add_direct = False, avg = 3, undersample  = True, globalCS = False):
+def prepare_dataset(data, list_of_parameters, data_path,  add_direct = False, avg = 3, train_size = 1.0, test_size = 0.0, undersample  = True, globalCS = False):
+    warnings.simplefilter("ignore")
     dataset = dict()
     #data.sort_values(by=['match_date'])
     dataset['match_id'] = data['match_id']
@@ -79,11 +86,34 @@ def prepare_dataset(data, list_of_parameters, data_path,  add_direct = False, av
     dataset['y'] = data['match_result']
     dataset['X'] = data[list_of_parameters]
     
+    if train_size < 0.0 or train_size > 1.0:
+        raise BadSplitSize("Podano błędną wartość 'train_size'.")
+    if test_size < 0.0 or test_size > 1.0:
+        raise BadSplitSize("Podano błędną wartość 'test_size'.")
+    if train_size + test_size > 1.0:
+        raise BadSplitSize("Podano błędną wartość 'train_size' oraz 'test_size.")
+
+    train_size = int(train_size * 100)
+    test_size = int(test_size * 100)
     if add_direct:
         add_direct_matches(dataset, data_path, avg)
+
     if undersample:
         dataset['X'], dataset['y'] = data_undersample(dataset['X'], dataset['y'], dataset['match_id'])
+    
+    temp = len(dataset['X']) * train_size // 100
+    temp_test = len(dataset['X']) * (100 - test_size) // 100
+
+    dataset['X_train'] = dataset['X'][:temp]
+    dataset['y_train'] = dataset['y'][:temp]
+
+    dataset['X_valid'] = dataset['X'][temp: temp_test]
+    dataset['y_valid'] = dataset['y'][temp: temp_test]
+        
+    dataset['X_test'] = dataset['X'][temp_test:]
+    dataset['y_test'] = dataset['y'][temp_test:]
+
     if globalCS:
-        dataset['X'], dataset['y'] = data_equalize(dataset['X'], dataset['y'])
+        dataset['X_train'], dataset['y_train'] = data_equalize(dataset['X_train'], dataset['y_train'])
 
     return dataset
