@@ -1,14 +1,16 @@
-import os
 import pandas as pd
 import numpy as np
+
+import os
 import sys
 from pathlib import Path
-import ipywidgets as widgets
-from ipywidgets import interact, interact_manual
-import pickle
-from sklearn.preprocessing import StandardScaler
 import warnings
 
+import ipywidgets as widgets
+from ipywidgets import interact, interact_manual
+
+import pickle
+from sklearn.preprocessing import StandardScaler
 
 sys.path.append(os.path.join(Path(os.getcwd()).parent, 'Preprocessing\\'))
 
@@ -19,7 +21,7 @@ from season import *
 from parameters import *
 from team import *
 
-LIST_OF_PARAMETERS = ['home_team_score',
+LIST_OF_PARAMETERS = [          'home_team_score',
                                 'away_team_score', 
                                 'home_team_seasons_played',
                                 'away_team_seasons_played', 
@@ -46,7 +48,7 @@ LIST_OF_PARAMETERS = ['home_team_score',
                                 'away_lost_games',
                                 'home_scored_goals', 
                                 'away_scored_goals'
-                            ]
+                    ]
 
 
 class Interactive():
@@ -71,10 +73,12 @@ class Interactive():
         self.dataset = prepare_dataset(all_data, self.list_of_parameters, all_data_past, add_direct = True, avg = 3, undersample = False, globalCS = False)
         self._get_teams_list_for_interactive()
 
-    def get_data_from_local(self, *, name = 'all_seasons_3.csv', data_dir = 'Dane', avg = 3):
+    def get_data_from_local(self, *, data_path, name = 'all_seasons_3.csv', avg = 3):
         warnings.simplefilter("ignore")
-        working_dir = Path(os.getcwd()).parent
-        data_path = os.path.join(working_dir.parent, data_dir)
+
+        #working_dir = Path(os.getcwd()).parent
+        #data_path = os.path.join(working_dir.parent, data_dir)
+        
         all_seasons = pd.read_csv(os.path.join(data_path, name), index_col=0) 
         all_seasons['match_date'] = pd.to_datetime(all_seasons['match_date'])
 
@@ -94,7 +98,7 @@ class Interactive():
 
     def dense_network(self, data):
         model = get_model()
-        model.load_weights("net_weigths.h5")
+        model.load_weights("saved\\SNN.h5")
         y_probas_dense = np.stack([model(data) for sample in range(100)])
         y_proba_dense = y_probas_dense.mean(axis=0)
         text = f"\n\nDenseNetwork probability: {y_proba_dense[0]}"
@@ -103,9 +107,9 @@ class Interactive():
 
     def svm(self, data):
         scaler = StandardScaler()
-        with open('SVM_scaler.pkl', 'rb') as f:
+        with open('saved\\SVM_scaler.pkl', 'rb') as f:
             scaler = pickle.load(f) 
-        with open('SVM.pkl', 'rb') as f:
+        with open('saved\\SVM.pkl', 'rb') as f:
             model = pickle.load(f)
         data = scaler.transform(data)
         result = model.predict(data)[0]
