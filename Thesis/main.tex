@@ -8,6 +8,12 @@
 \usepackage{amsmath}
 \usepackage{float}
 \usepackage{caption}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{subfig}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{dkgreen}{rgb}{0,0.3,0}
+
 
 %--------------------------------------
 % Strona tytułowa
@@ -32,6 +38,21 @@
 
 
 \begin{document}
+
+\lstset{
+  language=Python,
+  aboveskip=4mm,
+  belowskip=4mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  keywordstyle=\color{dkgreen},
+  commentstyle=\color{blue},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
 
 % Front matter starts here
 \frontmatter\pagestyle{empty}%

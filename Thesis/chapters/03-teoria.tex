@@ -1,14 +1,20 @@
 
 \chapter{Przegląd badań na temat eksploracji danych sportowych oraz pojęcia podstawowe}
-Temat eksploracji danych sportowych i wykorzystania metod z dziedziny uczenia maszynowego w sporcie rozwinął się znacząco w ostatnich latach. Świadczą o tym chociażby organizowane corocznie konferencje poświęcone szeroko rozumianej analizie sportu, takie jak MLSA (\textit{Machine Learning and Data Mining for Sports Analytics}) przeprowadzane co roku w innym kraju, czy \textit{MIT Sloan Sports Analytics Conference}, która ma miejsce w Stanach Zjednoczonych. Konferencje te zrzeszają nie tylko naukowców i badaczy, ale też trenerów, działaczy klubów, a nawet samych zawodników.
+\noindent Temat eksploracji danych sportowych i wykorzystania metod z dziedziny uczenia maszynowego w sporcie rozwinął się znacząco w ostatnich latach. Świadczą o tym chociażby organizowane corocznie konferencje poświęcone szeroko rozumianej analizie sportu, takie jak MLSA (\textit{Machine Learning and Data Mining for Sports Analytics})~\cite{MLSA20} przeprowadzane co roku w innym kraju, czy \textit{MIT Sloan Sports Analytics Conference}~\cite{MITSloan}, która ma miejsce w Stanach Zjednoczonych. Konferencje te zrzeszają nie tylko naukowców i badaczy, ale też trenerów, działaczy klubów, a nawet samych zawodników.
 
 W przeszłości prace naukowe dotyczące piłki nożnej pojawiały się rzadziej od prac traktujących o innych dyscyplinach sportowych~\cite{ml_soccer_analytics}. Wynika to z zupełnie innej natury tego sportu. Jak wspomniano w pracy~\cite{game_classification}, piłka nożna należy do sportu z kategorii terytorialnych (\english{territory games}), które zakładają kontrolę pewnego obiektu, trzymanie go z dala od przeciwnika i stopniowego przesuwania się do pozycji, która pozwoli zdobyć punkt/bramkę. Zawodnicy zarówno defensywni, jak i ofensywni zajmują ten sam obszar boiska próbując jednocześnie uniemożliwić zdobycie punktów przez przeciwnika. Taki styl gry różni się nieco od np. baseballu, który należy do kategorii określonej jako \textit{Striking/Fielding} i charakteryzuje się zdobywaniem punktu poprzez wykonanie rzutu i biegnięcie do wyznaczonego miejsca lub uniemożliwieniem zdobycia punktu przez przeciwnika poprzez przechwycenie tego rzutu. Mając na uwadze różnice w stylach tych dyscyplin, można zauważyć, iż łatwiej jest rozbić pojedynczy mecz w baseballu na dyskretne wydarzenia do analizy, a dynamiczna i skomplikowana struktura piłki nożnej czyni taką analizę znacznie trudniejszą.
 
-Potrzeba dostępu do szczegółowych i wyrafinowanych analiz meczów piłki nożnej spowodowała powstanie wielu komercyjnych firm takich jak \textit{Wyscout} czy \textit{StatsBomb}, które dostarczają wyszukanych analiz wideo dzielących każde mecze na czynniki pierwsze przy pomocy technik rozpoznawania obrazów (\english{computer vision}) i uwzględniają niewidoczne dla ludzkiego oka szczegóły - dokładną pozycję bramkarza w momencie utraty bramki, siłę strzału, pozycję zawodnika, od którego rozpoczęła się akcja bramkowa itd.
+Potrzeba dostępu do szczegółowych i wyrafinowanych analiz meczów piłki nożnej spowodowała powstanie wielu komercyjnych firm takich jak \textit{Wyscout}\footnote{\url{https://wyscout.com/}} czy \textit{StatsBomb}\footnote{\url{https://statsbomb.com/}}, które dostarczają wyszukanych analiz wideo dzielących każde mecze na czynniki pierwsze przy pomocy technik rozpoznawania obrazów (\english{computer vision}) i uwzględniają niewidoczne lub trudne do wychwycenia dla ludzkiego oka szczegóły - dokładną pozycję bramkarza w momencie utraty bramki, siłę strzału, pozycję zawodnika, od którego rozpoczęła się akcja bramkowa itd.
 
-Mimo iż techniki uczenia maszynowego w sporcie (a w szczególności w piłce nożnej) są najczęściej wykorzystywane w celu przewidywania zwycięzcy spotkania (chociażby prace z ostatniego dużego turnieju europejskiego - Euro 2016~\cite{Euro2016-1} \cite{Euro2016-2} \cite{Euro2016-3}), wiele dzieł dotyczy także innych zagadnień. Podejmowane są przykładowo tematy ewaluacji umiejętności danego zawodnika (oraz jego szans na dalszy rozwój) i całej drużyny~\cite{ml_soccer_analytics} \cite{soccer_players_skill}, które mogą potencjalnie wspomóc łowców talentów szukających nowych zawodników do drużyn, czy też automatycznego wykrywania ludzkiej aktywności ruchowej~\cite{activity_recignition}, które może umożliwić na przykład znalezienie optymalnych pozycji zawodników do wykonywania strzału, podania czy sprintu.
+Pomimo że techniki uczenia maszynowego w sporcie (a w szczególności w piłce nożnej) są najczęściej wykorzystywane w celu przewidywania zwycięzcy spotkania (chociażby prace z ostatniego dużego turnieju europejskiego - Euro 2016~\cite{Euro2016-1} \cite{Euro2016-2} \cite{Euro2016-3}), wiele badań dotyczy także innych zagadnień. Podejmowane są przykładowo tematy oceny umiejętności danego zawodnika (oraz jego szans na dalszy rozwój) i całej drużyny~\cite{ml_soccer_analytics} \cite{soccer_players_skill}, które mogą potencjalnie wspomóc łowców talentów szukających nowych zawodników do drużyn, czy też automatycznego wykrywania ludzkiej aktywności ruchowej~\cite{activity_recignition}, które może umożliwić na przykład znalezienie optymalnych pozycji zawodników do wykonywania strzału, podania czy sprintu.
 
-Zrealizowanie celu tej pracy, który zakłada zbudowanie systemu przewidującego wyniki meczów piłkarskich z ligi angielskiej, wymaga dostępu do dużej ilości danych danych znajdujących się w wielu repozytoriach. Z uwagi na wspomnianą popularność tej dyscypliny oraz zainteresowanie nią analityków, dostęp do tych danych nie stanowi problemu.
+Zrealizowanie celu tej pracy, który zakłada zbudowanie systemu przewidującego wyniki meczów piłkarskich z ligi angielskiej, wymaga dostępu do dużej ilości danych znajdujących się w wielu repozytoriach. Z uwagi na wspomnianą popularność tej dyscypliny oraz zainteresowanie nią analityków, dostęp do tych danych nie stanowi problemu, gdyż dostępnych jest wiele publicznych repozytoriów, z których te dane można pozyskać.
+
+~
+
+Po dokonanym przeglądzie prac o podobnej tematyce zauważono pewne interesujące zjawisko. W dużej liczbie prac~\cite{WorldCup-2018}~\cite{EloRating-1}~\cite{Euro2016-1}~\cite{Euro2016-2}~\cite{Euro2016-3} wspominany był ten sam atrybut zwany \emph{EloRating~\footnote{\url{http://clubelo.com/}}}. Jest on pewną miarą przedstawiającą siłę danej drużyny obliczany na podstawie jej wyników z przeszłości. W jednej z tych prac~\cite{EloRating-1} pokazano, że wytrenowany model przy użyciu tylko jednego atrybutu (będącego różnicą wartości \emph{Elo} dla obu drużyn w dniu rozgrywania meczu) przewyższał nawet te modele, które korzystały z około 100 różnych atrybutów. Ustępował tylko tym modelom, które jako atrybuty używały rynkowych kursów bukmacherskich. Pokazuje to, jak potencjalnie dużą wartość podczas predykcji wyniku może mieć wartość \emph{EloRating} (podobnie zresztą jak kursy proponowane przez zakłady bukmacherskie).
+
+Na podstawie wyników i wniosków z przytoczonych artykułów, w pracy tej, podczas trenowania modeli, zdecydowano się wykorzystać zarówno atrybut \emph{EloRating} jak i rynkowe kursy bukmacherskie ze względu na ich udowodnioną skuteczność podczas predykcji. Metody na pozyskiwanie tych atrybutów zostaną szczegółowo przedstawione w rozdziale \ref{data_aggregation}.
 
 \section{Bazy danych i API}
 Podstawą uczenia maszynowego są dane na których algorytmy mogą się uczyć, dlatego jednym z postawionych problemów było miejsce przechowywania danych jak i sposób ich pobierania.
@@ -19,18 +25,18 @@ RBD jest zbiorem tabel, z których każda ma za zadanie reprezentować różne e
 
 \begin{figure}[h] 
         \centering\includegraphics[width=14cm,height=10cm]{figures/Example_entities.PNG}
-        \caption{Przykładowych schemat relacji encji relacyjnej bazy danych.}\label{example-Entity}
+        \caption{Przykładowy schemat relacji encji relacyjnej bazy danych.}\label{example-Entity}
 \end{figure}
 
 Powodem dla którego nazywamy to relacyjną bazą danych jest możliwość wstawienia odnośnika jako kolumne, który wskazuje na rząd w innej tabeli. Patrząc na przykładowy schemat \ref{example-Entity}, można zauważyć, że kolumny \textit{TeamA\_Id} oraz \textit{TeamB\_Id} z tabeli \textit{Mecz}, odnoszą się do wartości w tabeli \textit{Drużyna}. Wartości w kolumnach, odwołujące się do innych tabel nazywamy \textit{kluczami obcymi}. \cite{Relational_Databases_Milan}
 
-Obecnie istnieje duża ilość oprogramowania, umożliwiającego zarządzanie takimi bazami danych, np. \textit{Microsoft SQL Server} czy \textit{PostgreSql}, lecz wszystkie sprowadzają się do ujednoliconego standardu ISO \cite{SQL_ISO}. Zdefiniowane są tam zasady, jaką RBD powinny mieć strukturę oraz jakie typy danych zawierają. W pracy zostały użyte z względu na łatwość dostępu do narzędzi oraz możliwości utworzenia instancji na chmurze, korzystając z Azure Cloud.
+Obecnie istnieje duża ilość oprogramowania, umożliwiającego zarządzanie takimi bazami danych, np. \textit{Microsoft SQL Server} czy \textit{PostgreSql}, lecz wszystkie sprowadzają się do ujednoliconego standardu ISO \cite{SQL_ISO}. Zdefiniowane są tam zasady, jaką RBD powinny mieć strukturę oraz jakie typy danych zawierają. W pracy zostały użyte ze względu na łatwość dostępu do narzędzi oraz możliwości utworzenia instancji na chmurze, korzystając z Azure Cloud.
 
 ~
 
-Problem pobierania danych dla algorytmów uczenia maszynowego został rozwiązany poprzez użycie WebAPI (\english{Web Application Programming Interfaces}). API to zbór funkcji i reguł wewnątrz aplikacji, umożliwiający interakcje z tą aplikacją za pośrednictwem oprogramowania \cite{webAPI_Mozzila}. W przypadku WebAPI korzystanie z interfejsu sprowadza się do wykonywania żądań http pod odpowiedni adres internetowy. Przykładowo API Twitter umożliwia pobranie ostatnich wpisów podanego użytkownika, za pomocą żądania http pod udostępniony URL (\english{Uniform Resource Locator}) oraz wiele innych interakcji z stroną \cite{Twitter_API}.
+Problem pobierania danych dla algorytmów uczenia maszynowego został rozwiązany poprzez użycie WebAPI (\english{Web Application Programming Interfaces}). API to zbór funkcji i reguł wewnątrz aplikacji, umożliwiający interakcje z tą aplikacją za pośrednictwem oprogramowania \cite{webAPI_Mozzila}. W przypadku WebAPI korzystanie z interfejsu sprowadza się do wykonywania żądań http pod odpowiedni adres internetowy. Przykładowo, API Twitter umożliwia pobranie ostatnich wpisów podanego użytkownika, za pomocą żądania http pod udostępniony URL (\english{Uniform Resource Locator}) oraz wiele innych interakcji z stroną \cite{Twitter_API}.
 
-Użycie WebAPI jako sposobu udostępniania danych umożliwia nam wstępnie zagregowanie danych do ujednoliconego formatu JSON (\english{(JavaScript Object Notation}), dla którego istnieje wiele parserów, dzięki czemu można z nim łatwo pracować \cite{JsonParserPython}.
+Użycie WebAPI jako sposobu udostępniania danych umożliwia nam wstępnie zagregowanie danych do ujednoliconego formatu JSON (\english{JavaScript Object Notation}), dla którego istnieje wiele parserów, dzięki czemu można z nim łatwo pracować \cite{JsonParserPython}.
 
 \section{Wstępne przetwarzanie i wizualizacja danych}
 
@@ -90,8 +96,6 @@ gdzie:
         \caption{Krzywa regresji logistycznej \cite{MGrzyb}}
 \end{figure}
 
-\newpage
-
 Jak możemy zauważyć z powyższego wykresu funkcja sigmoidalna daje wynik ciągły, który następnie sprowadzany jest do wyniku binarnego:
 
 \[
@@ -117,14 +121,14 @@ Na podstawie powyższego modelu jesteśmy w stanie przeprowadzić proste wniosko
     \item Średnia wieku piłkarzy - 25.4 lat
     \item Mecz rozgrywany na własnym stadionie - Nie
 \end{itemize}
-Znamy wartości wszystkich potrzebnych do wnioskowania atrybutów wobec czego jesteśmy w stanie rozpocząć proces predykcji rozpoczynając wnioskowanie od korzenia. Średnia wieku piłkarzy jest mniejsza jak 30 lat, wobec czego trafiamy do lewej gałęzi drzewa. Kolejno sprawdzamy czy badany przez nas mecz jest rozgrywany na własnym stadionie - według badanej obserwacji mecz jest rozgrywany na wyjeździe w związku z czym odpowiadamy, że nie i kierujemy się prawą gałęzią drzewa. W tym momencie dochodzimy do liścia z etykietą "Remis", która to etykieta jest naszą ostateczną predykcją wyniku meczu na podstawie wnioskowania w tym drzewie decyzyjnym.\\
+Znamy wartości wszystkich potrzebnych do wnioskowania atrybutów wobec czego jesteśmy w stanie rozpocząć proces predykcji rozpoczynając wnioskowanie od korzenia. Średnia wieku piłkarzy jest mniejsza jak 30 lat, wobec czego trafiamy do lewej gałęzi drzewa. Kolejno sprawdzamy czy badany przez nas mecz jest rozgrywany na własnym stadionie - według badanej obserwacji mecz jest rozgrywany na wyjeździe w związku z czym odpowiadamy, że nie i kierujemy się prawą gałęzią drzewa. W tym momencie dochodzimy do liścia z etykietą ,,Remis'', która to etykieta jest naszą ostateczną predykcją wyniku meczu na podstawie wnioskowania w tym drzewie decyzyjnym.\\
 
-Rozumiejąc ideę drzewa decyzyjnego jesteśmy w stanie przejść do omówienia algorytmu lasu losowego, który tak jak wspomnieliśmy jest zbiorem klasyfikatorów, gdzie każdy klasyfikator jest drzewem decyzyjnym. Każde drzewo wchodzące w skład lasu losowego jest uczone na specjalnie wylosowanej dla niego próbce danych pochodzącej ze zbioru uczącego, treningowego. Dodatkowo, w trakcie budowania drzewa decyzyjnego nie wszystkie atrybuty są brane pod uwagę przy wyznaczaniu reguły decyzyjnej w węźle. Losowany jest pewien podzbiór atrybutów, na podstawie których wyznaczana rest reguła decyzyjna w węźle. Obie opisane techniki działania na próbce danych i pewnym wylosowanym podzbiorze atrybutów stosowane są w celu zwiększenia stabilności odpowiedzi algorytmu i jego ochrony przed nadmiernym dopasowaniem do danych uczących, co było jedną z największych wad pojedynczego drzewa decyzyjnego i co przekłada się dodatkowo na lepszą skuteczność działania klasyfikatora na nowych danych. W trakcie przewidywania klasy dla próbki jest ona pokazywana wszystkim drzewom decyzyjnym, a jako końcowa decyzja o przynależności do klasy traktowanej jest przypisanie do klasy najczęściej wskazywanej przez drzewa decyzyjne w lesie. Dodatkowym plusem lasu losowego jest umiejętność wyznaczenia ważności atrybutów wejściowych. \cite{PPlonski}\\
+Rozumiejąc ideę drzewa decyzyjnego jesteśmy w stanie przejść do omówienia algorytmu lasu losowego, który tak jak wspomnieliśmy jest zbiorem klasyfikatorów, gdzie każdy klasyfikator jest drzewem decyzyjnym. Każde drzewo wchodzące w skład lasu losowego jest uczone na specjalnie wylosowanej dla niego próbce danych pochodzącej ze zbioru uczącego, treningowego. Dodatkowo, w trakcie budowania drzewa decyzyjnego nie wszystkie atrybuty są brane pod uwagę przy wyznaczaniu reguły decyzyjnej w węźle. Losowany jest pewien podzbiór atrybutów, na podstawie których wyznaczana jest reguła decyzyjna w węźle. Obie opisane techniki działania na próbce danych i pewnym wylosowanym podzbiorze atrybutów stosowane są w celu zwiększenia stabilności odpowiedzi algorytmu i jego ochrony przed nadmiernym dopasowaniem do danych uczących, co było jedną z największych wad pojedynczego drzewa decyzyjnego i co przekłada się dodatkowo na lepszą skuteczność działania klasyfikatora na nowych danych. W trakcie przewidywania klasy dla próbki jest ona pokazywana wszystkim drzewom decyzyjnym, a jako końcowa decyzja o przynależności do klasy traktowanej jest przypisanie do klasy najczęściej wskazywanej przez drzewa decyzyjne w lesie. Dodatkowym plusem lasu losowego jest umiejętność wyznaczenia ważności atrybutów wejściowych. \cite{PPlonski}\\
 
 Przykładowy proces wnioskowania na podstawie algorytmu lasu losowego możemy zobaczyć na poniższym obrazie
 \begin{figure}[h] 
         \centering\includegraphics[width=14cm]{figures/randomForestModel.JPG}
-        \caption{Przykładowy model lasu losowego}
+        \caption{Przykładowy model lasu losowego \cite{Geron}}
 \end{figure}
 
 \newpage
@@ -209,8 +213,9 @@ Można zauważyć, że metoda SVM jest silną metodą pozwalającą na rozwiązy
 \newpage
 
 \subsection{Sztuczne Sieci Neuronowe - SNN}
+\label{SNN-opis}
 
-\definicja{Sztuczna sieć neuronowa} ogólna nazwa struktur matematycznych i ich programowych lub sprzętowych modeli, realizujących obliczenia lub przetwarzanie sygnałów poprzez rzędy elementów przetwarzających, zwanych sztucznymi neuronami, wykonujących pewną podstawową operację na swoim wejściu. Oryginalną inspiracją takiej struktury była budowa naturalnych neuronów, łączących je synaps, oraz układów nerwowych, w szczególności mózgu \cite{Wiki:SNN}. Sztuczne sieci neuronowe charakteryzują się tym, że mają zdolność do odwzorowania różnych zależności pomiędzy sygnałami wejściowymi i wyjściowymi. Sztuczna sieć neuronowa składa się z wielu połączonych neuronów, a kady neuron można interpretować jako pewna kombinacja matematyczna cech wejściowych wraz z przypisanymi im wagami. Wyjście neuronu to pewna funkcja matematyczna, która przekształca daną kombinację danych wejściowych i przekazuje taki wynik na swoje wyjście. Graficzna reprezentacja takiego neuronu ma się następująco \cite{Prezentacja:SNN} --- \textbf{to jest także ze skryptu KKJS}:
+\definicja{Sztuczna sieć neuronowa} ogólna nazwa struktur matematycznych i ich programowych lub sprzętowych modeli, realizujących obliczenia lub przetwarzanie sygnałów poprzez rzędy elementów przetwarzających, zwanych sztucznymi neuronami, wykonujących pewną podstawową operację na swoim wejściu. Oryginalną inspiracją takiej struktury była budowa naturalnych neuronów, łączących je synaps, oraz układów nerwowych, w szczególności mózgu \cite{Wiki:SNN}. Sztuczne sieci neuronowe charakteryzują się tym, że mają zdolność do odwzorowania różnych zależności pomiędzy sygnałami wejściowymi i wyjściowymi. Sztuczna sieć neuronowa składa się z wielu połączonych neuronów, a kady neuron można interpretować jako pewna kombinacja matematyczna cech wejściowych wraz z przypisanymi im wagami. Wyjście neuronu to pewna funkcja matematyczna, która przekształca daną kombinację danych wejściowych i przekazuje taki wynik na swoje wyjście. Graficzna reprezentacja takiego neuronu ma się następująco \cite{Prezentacja:SNN} \cite{KrawiecStefanowski03} --- \textbf{to jest także ze skryptu KKJS}:
 \begin{figure}[H] 
         \centering\includegraphics[width=12cm,height=6cm]{figures/SNN.png}
         \caption{Sztuczny neuron}\label{SVM-neuron}
@@ -266,7 +271,7 @@ Korekta wag jest następująca \cite{Widrow}:
 \end{equation}
 Reguła delta z kolei obowiązuje dla neuronów z ciągłymi funkcjami aktywacji i nadzorowanego trybu uczenia. Regułę delta wyprowadza się jako wynik minimalizacji kryterium błędu średnio-kwadratowego Q.
 \[
-Q = \frac{1}{2}\sum_{j=1}^{N} \big( z^{j} - y^{j}\big)^{2} = \sum_{j}^{N}Q^{j}, Q^{j} = \frac{1}{2}(\delta^{j})^{2}
+    Q = \frac{1}{2}\sum_{j=1}^{N} \big( z^{j} - y^{j}\big)^{2} = \sum_{j}^{N}Q^{j}, Q^{j} = \frac{1}{2}(\delta^{j})^{2}
 \]
 
 Korekta wag:
@@ -300,6 +305,11 @@ Na podstawie wstecznej propagacji błędów, sieci neuronowe modyfikują wagi dl
 Wartości początkowe wag muszą być zainicjowane przed przystąpieniem do procesu uczenia i zazwyczaj dokonuje się tego w sposób losowy lub na podstawie pewnego rozkładu prawdopodobieństwa. Kluczowym czynnikiem do prędkości oraz jakości otrzymywanych wyników jest współczynnik $\eta$, który już mogliśmy zauważyć w równaniu \ref{eqn:delta}. Decyduje on o wpływie błędu popełnianego przez neuron na korektę wartości wag. Właściwy dobór ma kluczowe znaczenie dla prędkości zbieżności algorytmu, a jego zbyt mała wartość spowalnia proces uczenia i zwiększa ryzyko
 wpadnięcia w pułapkę lokalnego minimum \cite{Prezentacja:SNN}. 
 
+W momencie gdy ludzie zaczęli interesować się tematem uczenia maszynowego oraz sieciami neuronowymi zaczęto szerzej zgłębiać temat stawiając coraz to trudniejsze wyzwania. Powstało mnóstwo różnych struktur sieci. Te bardzo głębokie składające się z kilkunastu, a nawet kilkuset warstw ukrytych oraz sieci, które przyjęły trochę inną koncepcję przetwarzania danych. Jednym z dużych zmian, jakie nastąpiły w kwestii przetwarzania obrazów, było zastosowanie konwolucyjnych sieci neurnowych (\english{convolutional neural network})\cite{CNN}. Struktura takiej sieci różni się od podstawowej koncepcji tym, że zamiast w pełni połączonych warstw neuronów, posiada ona \definicja{konwolucyjne warstwy}, które mają za zadanie znalezienie pewnych wzorców na obrazie - tych większych jak i tych mniejszych. Wiele zastosowanych filtrów skanujących obraz wraz z połączeniem warstwową łączącą (\english{pooling layer}) daje w rezultacie o wiele większą skuteczność w dziedzinie przetwarzania obrazów dzięki wydobywaniu z obrazów pewnych zależności oraz połączeń pomiędzy pikselami tworzącymi obiekt \cite{Prezentacja:KKCNN} \cite{Prezentacja:CNNintro}.
+Inną koncepcją w głębokich sieciach neuronowych jest struktura zwana \definicja{Rekurencyjna sieć neuronowa}  \cite{Prezentacja:KKRNN}. Główną myślą w tej koncepcji było zastosowanie zwykłej głębokiej sieci neuronowej, lecz dodatkowo, poza zwykłymi połączeniami w przód, zastosowane zostały połączenia odwołujące się również do poprzednich warstw w strukturze sieci. Dzięki takiemu rozwiązaniu można było nauczyć sieć pewnych powtarzających się wzorców, które dzięki rekurencyjnym połączeniom były łatwiejsze do wykrycia \cite{Geron2}. Dodatkowo, aby zwiększyć ilość informacji, która zostanie zapamiętana przez daną strukturę sieci, zostały wprowadzone pewne jednostki, nazywane komórkami pamięci (\english{memory cell}), takimi jak \definicja{LSTM} \cite{LSTM} czy \definicja{GRU} \cite{GRU}. Technika ta otwarła wiele możliwości w przetwarzaniu szeregów czasowych oraz pozwoliła na rozpoczęcie pracy nad przetwarzaniem języka naturalnego.
+
+Poza wymienionymi powyżej przykładami, które różniły się budową od w pełni połączonej sieci neuronowej, powstało wiele różnych koncepcji, które były tworzone z myślą o konkretnych zastosowaniach i nie sposób opisać w tym akapicie wszystkich pomysłów.
+
 Niestety sieć neuronowa jest trudnym narzędziem i występuję w niej problem doboru wielkości warstw ukrytych, który do teraz jest problemem otwartym. 
 Nie istnieje jednoznaczna reguła określająca optymalny rozmiar danej warstwy oraz ilości warstw w danej sieci przy danym zbiorze uczącym. Zbyt mała wielkość warstw czyni sieć niezdolną do adaptacji do
 zadanego zbioru przykładów co skutkuje, że w trakcie uczenia błąd
@@ -310,12 +320,12 @@ Od początku historii SNN do teraz powstało mnóstwo konceptów, pomysłów, sz
 \section{Sposób oceny wyników predykcji}
 \label{section:ocenaWynikow}
 
-Różne algorytmy dają wyniki w różnych formatach. Przy pomocy jednych uzyskujemy tylko konkretną klasę, do której przynależy konkretne wejście, a inne przyporządkowują rozkład prawdopodobieństwa możliwych wyników klasyfikacji. W naszym przypadku mamy do czynienia z obiema sytuacjami. Podczas doboru sposobu oceny naszych algorytmów głównym celem było dobranie takich miar, aby móc wzajemnie porównywać zastosowane algorytmy i na tej podstawie dobrać najlepsze podejście. Ocena jakości naszych rozwiązań opierała się zatem na policzeniu \definicja{dokładności} (\english{accuracy}) na zbiorze testowym (wynoszącym 10\% całego zbioru danych), macierzy pomyłek oraz wynikające z niej miary takie jak: \definicja{precyzja} (\english{precision}, interpretujemy jako stosunek tp / (tp + fp), gdzie tp to liczba poprawnie sklasyfikowanych przykładów, a fp to liczba niepoprawnie sklasyfikowanych przykładów.), \definicja{czułość} (\english{recall}, interpretujemy jako stosunek tp / (tp + fn), gdzie tp jest liczbą poprawnie sklasyfikowanych przykładów, a fn liczbą niepoprawnie sklasyfikowanych przykładów.) oraz \definicja{F-score} (\definicja{F-score} interpretuje się jako ważoną średnią harmoniczną precyzji i czułości, gdzie wynik \definicja{F-score} osiąga najwyższą wartość przy 1, a najniższą przy 0), którą wyznaczyliśmy przy użyciu średniej typu „macro” (oblicza metryki dla każdej etykiety, a następnie wyznacza ich nieważoną średnią. Metoda ta nie uwzględnia niezbalansowania danych) \cite{SKfscore}. Dodatkowo do porównania zastosowaliśmy macierz pomyłek, której schemat można zobaczyć w tabeli \ref{tab:macierz}
+Różne algorytmy dają wyniki w różnych formatach. Przy pomocy jednych uzyskujemy tylko konkretną klasę, do której przynależy konkretne wejście, a inne przyporządkowują rozkład prawdopodobieństwa możliwych wyników klasyfikacji. W naszym przypadku mamy do czynienia z obiema sytuacjami. Podczas doboru sposobu oceny algorytmów głównym celem jest dobranie takich miar, aby móc wzajemnie porównywać zastosowane algorytmy i na tej podstawie dobrać najlepsze podejście. Ocena jakości rozwiązań opierała się zatem na policzeniu \definicja{dokładności} (\english{accuracy}) na zbiorze testowym (wynoszącym 10\% całego zbioru danych), macierzy pomyłek oraz wynikające z niej miary takie jak: \definicja{precyzja} (\english{precision}, interpretować ją można jako stosunek tp / (tp + fp), gdzie tp to liczba poprawnie sklasyfikowanych przykładów, a fp to liczba niepoprawnie sklasyfikowanych przykładów.), \definicja{czułość} (\english{recall}, interpretować można jako stosunek tp / (tp + fn), gdzie tp jest liczbą poprawnie sklasyfikowanych przykładów, a fn liczbą niepoprawnie sklasyfikowanych przykładów.) oraz \definicja{F-score} (\definicja{F-score} interpretuje się jako ważoną średnią harmoniczną precyzji i czułości, gdzie wynik \definicja{F-score} osiąga najwyższą wartość przy 1, a najniższą przy 0), którą wyznaczono przy użyciu średniej typu „macro” (oblicza metryki dla każdej etykiety, a następnie wyznacza ich nieważoną średnią. Metoda ta nie uwzględnia niezbalansowania danych) \cite{SKfscore}. Dodatkowo w celu porównania zastosowana została macierz pomyłek, której schemat można zobaczyć w tabeli \ref{tab:macierz}
 
 \begin{center}
 \begin{table}[H]
 \renewcommand{\arraystretch}{1.5}
-\caption{Macierz pomyłek dla naszego problemu klasyfikacji}
+\caption{Macierz pomyłek dla problemu klasyfikacji}
 \label{tab:macierz}
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|}
@@ -324,13 +334,13 @@ Różne algorytmy dają wyniki w różnych formatach. Przy pomocy jednych uzysku
    \multicolumn{1}{c}{} & & Draw & HomeWin & AwayWin \\ \hline
    
    {Observed}
-   & Draw & .. & .. & ..  \\ \cline{2-5}
-   & HomeWin & .. & .. & ..  \\ \cline{2-5}
-   & AwayWin & .. & .. & .. \\ \hline
+   & Draw & T & F & F \\ \cline{2-5}
+   & HomeWin & F & T & F  \\ \cline{2-5}
+   & AwayWin & F & F & T \\ \hline
 \end{tabular}
 \end{center}
 \end{table}
 \end{center}
 
-Dodatkowo przetestowaliśmy nasze algorytmy w sposób, w którym dane wejściowe podzieliliśmy na bloki następujące po sobie. Następnie wyuczyliśmy nasz algorytm na pierwszym bloku i testowaliśmy jego działanie na mniejszym bloku, który w zbiorze danych występował zaraz po bloku uczącym. Kolejno do dotychczasowego zbioru uczącego dołożyliśmy dane z poprzedniego bloku testowego i na podstawie nowego zbioru znów dokonaliśmy uczenia maszynowego by następnie dokonać ewaluacji na kolejnym fragmencie zbioru testowego. Proces ten powtarzaliśmy, aż do wykorzystania wszystkich dostępnych i przygotowanych danych.
+Dodatkowo przetestowano algorytmy w sposób, w którym dane wejściowe podzielono na bloki następujące po sobie. Następnie wyuczono algorytmy na pierwszym bloku i testowano jego działanie na mniejszym bloku, który w zbiorze danych występował zaraz po bloku uczącym. Kolejno do dotychczasowego zbioru uczącego dołożono dane z poprzedniego bloku testowego i na podstawie nowego zbioru znów dokonano uczenia maszynowego by następnie dokonać ewaluacji na kolejnym fragmencie zbioru testowego. Proces ten powtarzano, aż do wykorzystania wszystkich dostępnych i przygotowanych danych.
 
