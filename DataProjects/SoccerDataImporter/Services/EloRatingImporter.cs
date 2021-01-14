@@ -1,13 +1,13 @@
-﻿using SoccerDataImporter.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
 using SoccerDataImporter.DatabaseModels;
-using Microsoft.EntityFrameworkCore;
+using SoccerDataImporter.Interfaces;
+using SoccerDataImporter.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using SoccerDataImporter.Models;
 
 namespace SoccerDataImporter.Services
 {
@@ -17,12 +17,12 @@ namespace SoccerDataImporter.Services
 		private const string apiBaseUri = "http://api.clubelo.com/";
 		private readonly MatchPredictDbContext _dbContext;
 
-
 		public EloRatingImporter(IEloRatingHttpClient httpClient, MatchPredictDbContext dbContext)
 		{
 			_httpClient = httpClient;
 			_dbContext = dbContext;
 		}
+
 		public async Task ImportTeamEloRatingHistory(TeamsToImportSetting teams, string destinationDirectory)
 		{
 			Console.ForegroundColor = ConsoleColor.Green;
@@ -38,7 +38,6 @@ namespace SoccerDataImporter.Services
 			Console.ResetColor();
 			var eloRatingList = GetEloRatingListFromCsvFile(fileDestination);
 			await ImportEloRatingToDatabase(eloRatingList, teams.DbTeamName);
-
 		}
 
 		private async Task ImportEloRatingToDatabase(List<EloRatingApiModel> eloRatingList, string dbTeamName)
@@ -56,8 +55,8 @@ namespace SoccerDataImporter.Services
 
 		private List<EloRatingApiModel> GetEloRatingListFromCsvFile(string fileDestination)
 		{
-			var earliestDate =  _dbContext.Match.OrderBy(x => x.Date).First().Date.Value;
-			var latestDate =  _dbContext.Match.OrderBy(x => x.Date).Last().Date.Value;
+			var earliestDate = _dbContext.Match.OrderBy(x => x.Date).First().Date.Value;
+			var latestDate = _dbContext.Match.OrderBy(x => x.Date).Last().Date.Value;
 
 			return File.ReadAllLines(fileDestination)
 				.Skip(1)
@@ -68,9 +67,10 @@ namespace SoccerDataImporter.Services
 
 		private async Task<bool> SaveToCsvFile(string fileName, Uri teamUri)
 		{
+			Directory.CreateDirectory(fileName.Substring(0, fileName.LastIndexOf("/")));
 			try
 			{
-				using (var responseStream = await _httpClient.GetEloRatingResposne(teamUri))
+				using (var responseStream = await _httpClient.GetEloRatingResponse(teamUri))
 				{
 					using (var fileStream = File.Create(fileName))
 					{

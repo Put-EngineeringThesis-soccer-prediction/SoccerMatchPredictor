@@ -13,8 +13,10 @@ namespace SoccerDataImporter.DatabaseModels
 		public decimal Elo { get; set; }
 		public DateTime StartDate { get; set; }
 		public DateTime EndDate { get; set; }
+
 		[JsonIgnore]
 		public virtual Team TeamApi { get; set; }
+
 		public virtual Country Country { get; set; }
 	}
 }

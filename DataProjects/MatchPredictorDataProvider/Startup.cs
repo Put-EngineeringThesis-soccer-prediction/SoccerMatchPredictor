@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SoccerDataImporter.DatabaseModels;
 using System;
-using System.Configuration;
 
 [assembly: FunctionsStartup(typeof(MatchPredictorDataProvider.Startup))]
 

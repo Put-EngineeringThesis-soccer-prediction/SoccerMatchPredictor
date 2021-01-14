@@ -24,13 +24,14 @@ namespace SoccerDataImporter.Models
 		public int? AwayTeamYellowCards { get; set; }
 		public int? AwayTeamRedCards { get; set; }
 		public int? HomeTeamRedCards { get; set; }
+
 		public static FootballDataModel FromCsv(string csvLine, List<string> headerList)
 		{
 			string[] values = csvLine.Split(',');
 
 			FootballDataModel modelValues = new FootballDataModel();
 			var dateString = values[headerList.IndexOf("Date")];
-			if(dateString.Length < 9)
+			if (dateString.Length < 9)
 			{
 				dateString = dateString.Insert(dateString.LastIndexOf('/') + 1, "20");
 			}

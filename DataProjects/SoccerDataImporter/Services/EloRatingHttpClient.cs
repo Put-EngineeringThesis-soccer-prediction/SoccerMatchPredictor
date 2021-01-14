@@ -6,15 +6,16 @@ using System.Threading.Tasks;
 
 namespace SoccerDataImporter.Services
 {
-	class EloRatingHttpClient : IEloRatingHttpClient
+	public class EloRatingHttpClient : IEloRatingHttpClient
 	{
 		private readonly HttpClient _client;
+
 		public EloRatingHttpClient(HttpClient client)
 		{
 			_client = client;
 		}
 
-		public async Task<Stream> GetEloRatingResposne(Uri requestUri)
+		public async Task<Stream> GetEloRatingResponse(Uri requestUri)
 		{
 			return await _client.GetStreamAsync(requestUri);
 		}

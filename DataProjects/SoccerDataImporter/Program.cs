@@ -1,13 +1,13 @@
-﻿using SoccerDataImporter.Interfaces;
-using SoccerDataImporter.DatabaseModels;
-using SoccerDataImporter.Services;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SoccerDataImporter.DatabaseModels;
+using SoccerDataImporter.Interfaces;
+using SoccerDataImporter.Models;
+using SoccerDataImporter.Services;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using SoccerDataImporter.Models;
 
 namespace SoccerDataImporter
 {
@@ -57,7 +57,7 @@ namespace SoccerDataImporter
 			{
 				var teams = configuration.GetSection(teamsToMergeKey).Get<List<TeamsToMergeSetting>>();
 				Dictionary<string, string> footballToDbDict = new Dictionary<string, string>();
-				foreach(var team in teams)
+				foreach (var team in teams)
 				{
 					footballToDbDict[team.FootballDataTeamName] = team.DbTeamName;
 				}

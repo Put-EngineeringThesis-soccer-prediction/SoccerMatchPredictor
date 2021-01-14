@@ -5,6 +5,6 @@ namespace MatchPredictorDataProvider.DtoModels
 {
 	public class TeamHistory
 	{
-		public List<Match> MatchHistory { get; set;}
+		public List<Match> MatchHistory { get; set; }
 	}
 }

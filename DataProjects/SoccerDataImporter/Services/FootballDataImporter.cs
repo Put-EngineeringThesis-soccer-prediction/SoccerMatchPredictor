@@ -1,12 +1,12 @@
-﻿using SoccerDataImporter.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
 using SoccerDataImporter.DatabaseModels;
-using Microsoft.EntityFrameworkCore;
+using SoccerDataImporter.Interfaces;
+using SoccerDataImporter.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using SoccerDataImporter.Models;
 
 namespace SoccerDataImporter.Services
 {
@@ -33,10 +33,10 @@ namespace SoccerDataImporter.Services
 			{
 				var footballData = GetMatchesFromCsvFiles(file);
 				var dbMatchesBatch = new List<Match>();
-				foreach(var matchFromCsv in footballData)
+				foreach (var matchFromCsv in footballData)
 				{
 					var matchFromDb = await GetMatchFromDb(matchFromCsv, footballToDbDict);
-					
+
 					dbMatchesBatch.Add(AlterMatch(matchFromDb, matchFromCsv));
 				}
 				Console.ForegroundColor = ConsoleColor.Cyan;
@@ -67,7 +67,6 @@ namespace SoccerDataImporter.Services
 			matchFromDb.AwayTeamYellowCards = matchFromCsv.AwayTeamYellowCards;
 			matchFromDb.AwayTeamRedCards = matchFromCsv.AwayTeamRedCards;
 			return matchFromDb;
-
 		}
 
 		private async Task<Match> GetMatchFromDb(FootballDataModel matchFromCsv, Dictionary<string, string> footballToDbDict)
@@ -79,7 +78,6 @@ namespace SoccerDataImporter.Services
 
 		private List<FootballDataModel> GetMatchesFromCsvFiles(string file)
 		{
-
 			var header = File.ReadAllLines(file).First<string>().Split(',').ToList();
 
 			return File.ReadAllLines(file)
@@ -88,6 +86,5 @@ namespace SoccerDataImporter.Services
 				.Where(v => v != null)
 				.ToList();
 		}
-
 	}
 }
