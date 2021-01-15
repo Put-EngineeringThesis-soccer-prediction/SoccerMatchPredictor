@@ -4,9 +4,9 @@
 
 Kolejną decyzją do podjęcia był transfer danych z przygotowanego źródła, do skryptów przygotowujących cechy dla algorytmów uczenia maszynowego. Komponentem do tego wykorzystywanym jest aplikacja internetowa, utworzona jako WebAPI. Założone zostało, że zapytania do bazy danych powinny zostać wykonane na niezależnym poziomie, aby umożliwić wykorzystanie zasobów platformy Azure Cloud.
 
-W celu rozdzielenia algorytmów i przygotowywania cech, które otrzymają one na wejściu, powstała biblioteka w utworzona w języku Python. dzięki temu twórcy algorytmów uczących mogą niezależnie otrzymywać jednolicie przetworzone dane.
+W celu rozdzielenia algorytmów i przygotowywania cech, które otrzymają one na wejściu, powstała biblioteka w utworzona w języku Python. Dzięki temu twórcy algorytmów uczących mogą niezależnie otrzymywać jednolicie przetworzone dane.
 
-Wszystkie te komponenty są zapleczem dla głównego celu systemu, czyli środowiska w którym użytkownik będzie mógł skorzystać z wcześniej przygotowanych danych i algorytmów. Jest nim Interaktywny \textit{Jupter Notebook}, który jest narzędziem do wykonywania predykcji przez utworzone algorytmy.
+Wszystkie te komponenty są zapleczem dla głównego celu systemu, czyli środowiska w którym użytkownik będzie mógł skorzystać z wcześniej przygotowanych danych i algorytmów. Jest nim interaktywny \textit{Jupter Notebook}, który jest narzędziem do wykonywania predykcji przez utworzone algorytmy.
 
 Cały system przedstawia schemat widoczny na rysunku \ref{fig:arch1}.
 \newpage
@@ -58,7 +58,7 @@ Ostatnim elementem jest widoczny na schemacie \textbf{Python notebook predictor}
     
 \end{figure}
  
-\noindent Rysunek \ref{fig:match_predict_schema} przedstawia schemat bazy danych \textit{Match Predict Database} widocznej na rysunku architektury systemu \ref{fig:arch1}. Jest to relacyjna baza danych, stworzona jak to wcześniej wspomniane w \ref{arch}, przy użyciu technologii Microsoft SQL Server.
+\noindent Rysunek \ref{fig:match_predict_schema} przedstawia schemat bazy danych \textbf{Match Predict Database} widocznej na rysunku architektury systemu \ref{fig:arch1}. Jest to relacyjna baza danych, stworzona jak to wcześniej wspomniane w \ref{arch}, przy użyciu technologii Microsoft SQL Server.
 
 Bazą dla schematu była pozyskana z strony Kaggle.com baza \textit{European Soccer Database} \cite{kagggle_european_soccer_database}. Została przerobiona, aby działała w systemie Microsoft SQL Sever i odpowiednio przefiltrowana, tak aby zawierała dane tylko z interesującej nas ligi angielskiej.
 
@@ -84,7 +84,7 @@ W centrum wszystkich tabel znajduję się tabela \textbf{Match}. Zawiera on dane
     
     \item Pola home/away\_player\_1-11 są kluczami obcymi, które odnoszą się do tabeli \textbf{Player}. Zawierają wartości player\_api\_id poszczególnych zawodników biorących udział w rozgrywce.
     
-    \item Widoczne na schemacie \ref{fig:match_predict_schema} pola zaczynając od B365H do BSA to wartości przedstawiające wysokości kursów, które poszczególne zakłady bukmacherskie na dany moment przyjmowały zakłady. Kolumny kończące się na H wskazują zakład oznaczający wygraną gospodarza, kończące się na 'A' wygraną drużyny gości, a 'D' oznacza kurs na zakłady, które oznaczają remis. Według opisu zbioru danych z strony Kaggle.com \cite{kagggle_european_soccer_database}, dane te pochodzą z strony www.football-data.co.uk, gdzie można znaleźć historyczne wartości zakładów bukmacherskich w lidze angielskiej.
+    \item Widoczne na schemacie \ref{fig:match_predict_schema} pola zaczynając od B365H do BSA to wartości przedstawiające wysokości kursów, które poszczególne zakłady bukmacherskie na dany moment przyjmowały zakłady. Kolumny kończące się na H wskazują zakład oznaczający wygraną gospodarza, kończące się na 'A' wygraną drużyny gości, a 'D' oznacza kurs na zakłady, które oznaczają remis. Według opisu zbioru danych z strony \url{www.Kaggle.com} \cite{kagggle_european_soccer_database}, dane te pochodzą z strony \url{football-data.co.uk}, gdzie można znaleźć historyczne wartości zakładów bukmacherskich w lidze angielskiej.
     
     \item Pola od HomeTeamShots do AwayTeamRedCard w tabeli \textbf{Match} zawierają wszelkie statystyki meczu takie jak strzały na bramkę, faule, ilości żółtych i czerwonych kartek w meczu.
 \end{itemize}
@@ -93,7 +93,7 @@ Tabele \textbf{Country} oraz \textbf{League} zawierają tylko informacje o nazwa
 
 Encja \textbf{Team} zawiera nazwy drużyn oraz ich identyfikatory z oryginalnych źródeł danych (team\_api\_id \cite{football_data_enetscore} oraz team\_fifa\_api\_id \cite{Sofifa}).
 
-Tabela \textbf{Team\_Attributes} jest wypełniona informacjami o statystykach drużyny, które zostały zebrane z corocznych wydań gry Fifa produkowanej przez firmę E.A Games. Autor zestawu danych z strony Kaggle.com \cite{kagggle_european_soccer_database} zdobył te dane z strony internetowej zawierającej te statystyki \cite{Sofifa}. Każdy wpis w encji zawiera datę, dzięki której wiemy do którego roku odnosi się danych wpis dla danej drużyny. Klucze obce team\_api\_id oraz team\_fifa\_api\_id są referencją do tabeli \textbf{Team}.
+Tabela \textbf{Team\_Attributes} jest wypełniona informacjami o statystykach drużyny, które zostały zebrane z corocznych wydań gry Fifa produkowanej przez firmę E.A Games. Autor zestawu danych z strony \url{www.Kaggle.com} \cite{kagggle_european_soccer_database} zdobył te dane z strony internetowej zawierającej te statystyki \cite{Sofifa}. Każdy wpis w encji zawiera datę, dzięki której wiemy do którego roku odnosi się danych wpis dla danej drużyny. Klucze obce team\_api\_id oraz team\_fifa\_api\_id są referencją do tabeli \textbf{Team}.
 
 Encja \textbf{Player} posiada podstawowe informacje o poszczególnych zawodnikach takie jak wzrost, rok urodzenia i wagę. Oprócz podobnie jak w tabeli \textbf{Team} posiada unikalne identyfikatory, które pochodzą z oryginalnych źródeł.
 
@@ -102,8 +102,17 @@ Podobnie jak w przypadku drużyn, każdy zawodnik posiada zestaw statystyk okre�
 Ostatnią tabelą która znajduje się na schemacie \ref{fig:match_predict_schema} jest \textbf{EloRating}. Dane w tej tabeli pochodzą z strony internetowej \url{http://clubelo.com/} a główną wartością pobieraną z niej to wartość Elo. \definicja{StartDate} oraz \definicja{EndDate} to towarzyszące tej wartości momenty, między którymi była obowiązująca. Rank to miejsce w rankingu danej drużyny, gdzie kryterium jest właśnie 'Elo rating'. Team\_api\_id to klucz obcy odnoszący się do tabeli \textbf{Team}, służący do ustalenia, do której drużyny należy dany wpis Elo. CountryId to klucz obcy do encji \textbf{Country}.
 
 Wszystkie tabele mają klucz główny oznaczony jako Id, który jest unikalną liczbą identyfikującą jednoznacznie każdy wpis w poszczególnych tabelach.
+\newpage
+\section{Opis webAPI} \label{arch:webApi}
+\noindent
+Bezpośrednie pobieranie informacji z bazy danych nie byłoby wygodne dla użytkowników, w tym celu utworzone zostało webAPI nazwane \textbf{Match Predict Data Importer} na schemacie \ref{fig:arch1}. Zaprojektowane w technologii \definicja{Azure Function}\footnote{\url{https://docs.microsoft.com/pl-pl/azure/azure-functions/functions-overview}} udostępnione w sieci przy pomocy platformy Azure Cloud.
 
-\section{Opis web API}
+Podczas projektowania systemu zostały ustalone dwa punkty końcowe, których odpowiedzią miały być wstępnie przetworzone dane w formacie JSON.
+\begin{itemize}
+    \item \textbf{api/Matches/Season/DetailedMatch/\{season\}/\{historicalMatches\}} - funkcja ta zwraca mecze z szczegółowymi informacjami, dla podanego sezonu. Argument \textit{season} określa, jak nazwa wskazuje, sezon ligowy, jest to liczba oznaczająca rok rozpoczęcia się rozgrywek, np. '2010' oznacza sezon '2010/2011'. Drugim parametrem jest \textit{historicalMatches}, który jest również liczbą oznaczającą ile przeszłych spotkań, dla każdej z drużyn w meczu, również pobrać. Drugim zastosowaniem tego argumentu jest ile przeszłych bezpośrednich starć drużyn zostanie obliczone. Wszystkie te informacje są zwracane w formacie JSON jako lista zawierająca obiekty nazwane \textbf{DetailedMatchWithHistory}, w których znajdują się szczegóły meczu oraz detale każdej z drużyn i graczy biorących udział w rozgrywce wraz z historycznymi meczami. 
+    \item \textbf{api/Matches/Season/DetailedMatch/\{season\}/\{teamId\}/\{historicalMatches\}} - w tej funkcji również zwracane są szczegółowo opisane mecze dla konkretnego sezonu. Jedyną różnicą między tym, a poprzednim punktem końcowym jest parametr \textit{teamId}, określający Id drużyny, dla której chcemy otrzymać spotkania w danym sezonie.
+\end{itemize}
+
 \section{Środowisko użytkownika docelowego}
 \noindent
 Jak wspomniano wcześniej, aplikacja jest tworzona dla osób chętnych wzięcia udziału w zakładach bukmacherskich oraz analityków i statystyków konkretnych drużyn, które posiadałyby chęć sprawdzenia aktualnej formy swojego zespołu i porównania z innym zespołem i na podstawie tego oraz otrzymanego przewidywanego wyniku określić taktykę na nadchodzący mecz. Wiele osób pożąda takich informacji ponieważ są one odpowiedzią zwrotną otrzymywaną nie w czasie lub po rozegranym meczu, lecz przed nim. Dzięki posiadaniu takich informacji można dobrać odpowiednią taktykę, zmienić skład wyjściowy danego zespołu czy zastosować jeszcze inne modyfikacje w celu maksymalizacji szansy na wygraną. Jednak jak powszechnie wiadomo, nie każdy posiada zdolności programistyczne. Jednak analitycy sportowi jak i osoby interesujące się szeroko pojętą informatyką, będą potrafiły skorzystać z przygotowanego środowiska do pozyskiwania odpowiedzi zbudowanego systemu dla konkretnych zapytań. Nie jest tu potrzebna zdolność programistyczna, a jedynie wymagana jest wiedza jak załadować i otworzyć dany interfejs (jeśli potencjalny użytkownik nie wyrazi chęci instalacji \definicja{jupter notebook} na swoim komputerze, istnieje wiele różnych środowisk internetowy, które można bezpłatnie wykorzystywać, w tym ładować odpowiednie pliki i uruchamiać dane skrypty. Jednym z nich jest popularna platforma chmurowa \definicja{Google colab}). 
@@ -127,7 +136,7 @@ Dodatkowo, pozwala się użytkownikowi na wybór preferowanego przez niego algor
 \end{figure}
 W momencie, kiedy użytkownik wyraziłby chęć wykorzystania wszystkich algorytmów, zostaje mu udostępniona taka możliwość i na zasadzie głosowania większościowego (klasa, które uzyska większość głosów zostaje zwrócona, w przeciwnym wypadku komunikat od braku dominanta i zachęcenia do wybrania konkretnego algorytmu) użytkownik jest wstanie uzyskać wynik. W przypadku algorytmów, które zwracają rozkład prawdopodobieństwa przynależności do konkretnych klas wynikowych, również ta informacja jest zwrócona i wyświetlona dla użytkownika, w celu pokazania mu czy dany wynik jest bardziej lub mniej pewny według wybranego algorytmu. 
 
-\begin{figure}%
+\begin{figure}[H]%
     \centering
     \subfloat[\centering Wynik wraz z prawdopodobieństwem]{{\includegraphics[width=6cm,height=5cm]{figures/Interactive_results.png} }}%
     \qquad
@@ -135,5 +144,4 @@ W momencie, kiedy użytkownik wyraziłby chęć wykorzystania wszystkich algoryt
     \caption{Otrzymywane odpowiedzi zwrotne}%
     \label{fig:Results}%
 \end{figure}
-Tak więc, interaktywny notebook jest bardzo prostym lecz zarazem intuicyjnym interfejsem, który każdy może z powodzeniem wykorzystać i odczytać wyniki na podstawie nauczonych przez nas modeli predykcyjnych.
-\section{Ew. dodatkowe narzędzia analizy danych}
+Podsumowując, interaktywny notebook jest bardzo prostym lecz zarazem intuicyjnym interfejsem, który każdy może z powodzeniem wykorzystać i odczytać wyniki na podstawie nauczonych modeli predykcyjnych.

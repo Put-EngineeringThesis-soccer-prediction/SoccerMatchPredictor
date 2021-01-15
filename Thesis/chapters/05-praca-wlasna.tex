@@ -1,10 +1,86 @@
 \chapter{Własne propozycje rozwiązań}
     \section{Pozyskanie i agregowanie danych} \label{data_aggregation}
+    \noindent Podstawowym zadaniem, przed wykonaniem jakichkolwiek innych prac było zebranie danych używanych do uczenia maszynowego. W tym celu musiała zostać wykonana analiza znalezionych repozytoriów i ich odpowiednia transformacja, aby umieścić je w wspólnej bazie danych. W pracy zrezygnowano z płatnych źródeł takich jak wcześniej wspomnianych \textit{Wyscout} czy \textit{StatsBomb}. Zdecydowano wybrać darmowe repozytoria, które posiadały dobre opinie i można było im zaufać. Każdy z zbiorów posiadał pewne interesujące informacje, które dopełniały się nawzajem co umożliwiło nam uzyskanie spójnego zestawu ciekawych danych.
         \subsection{Europejska baza danych piłkarskich}
+        \noindent Centrum znalezionych repozytoriów stanowiła Europejska baza danych piłkarskich (\english{European Soccer Database \cite{kagggle_european_soccer_database}}). Pochodzi ona z popularnej strony internetowej \url{www.Kaggle.com} na której można znaleźć wiele zestawów danych powszechnie używanych do analizy przez społeczność analityków, którzy korzystają z wspomnianego portalu. Jest to utworzona w technologii SQLite baza danych zawierająca informacje na temat meczów ligowych odbywających się w Europie. Można tam znaleźć takie ligi jak niemiecka Bundesliga, polska Ekstraklasa czy właśnie interesująca nas angielska Premier League. Zbiór pochodzi z roku 2016 i posiada mecze z sezonów od 2008 do 2016 
+        Dane zebrane przez użytkownika Hugo Mathien, pochodzą z trzech wspomnianych przez niego źródeł.
+        \begin{itemize}
+            \item \url{http://football-data.mx-api.enetscores.com/} - według twórcy z tej strony pochodzą wyniki rozgrywek wraz z szczegółowym opisem drużyn w tych właśnie meczach. Bezpośrednio strona juz jest niestety niedostępna, lecz można wejść na \url{https://www.enetscores.com/} i zauważyć że zawiera ona wyniki na żywo dla różnych rozgrywek sportowych, wliczając w to piłkę nożną.
+            \item \url{http://www.football-data.co.uk/} - Witryna z informacjami dotyczącymi kursów bukmacherskich dla ligi między innymi angielskiej. Więcej o tej stronie znaleźć można w rozdziale \ref{subsec:football-data}.
+            \item \url{http://sofifa.com/} - portal zbierający dane z popularnej gry komputerowej Fifa. Europejska baza danych piłkarskich jest uzupełniona danymi o statystykach piłkarzy oraz drużyn pochodzącymi z corocznych edycji wspomnianego tytułu.
+        \end{itemize}
+        Baza posiadała już określone relacje między encjami, które zostały zachowane w docelowej bazie danych utworzonej w systemie, w celu zachowania spójności udostępnionych danych. 
+        
+        Zbiór należało przenieść z technologii SQLite do Microsoft SQL Server. W tym celu wykorzystane zostało narzędzie do przeglądania baz danych typu SQLite za pomocą którego, zostały wyeksportowane poszczególne tabelę do postaci skryptów języka SQL. Korzystając z tych skryptów można było zasilić bazę danych utworzoną w technologii Microsoft SQL Server uruchamiając je w odpowiedniej kolejności. Kolejnym krokiem było odfiltrowanie nieinteresujących danych, celem było otrzymanie bazy, która zawierała dane tylko o meczach ligi angielskiej, z tego powodu odpowiednie zapytania posłużyły do usunięcia zbędnych danych i zachowania tylko tych, które posiadały wartość dla systemu, zgodnie z założeniami.
+        
         \subsection{Elo Rating klubów piłkarskich}
-        \subsection{Historyczne dane zakładów piłkarskich}
+        \noindent Elo rating, które było często wykorzystywane w badanych algorytmach uczenia maszynowego \cite{EloRating-1}, pochodzi z strony internetowej \url{www.clubelo.com}. Można tam znaleźć dane nawet do roku 1939. Ranking utworzony na wspomnianym portalu powstał jedynie na podstawie meczów piłki nożnej i jest aktualizowany na bieżąco, obliczane przy pomocy algorytmu, który szczegółowo opisany jest na stronie, z której dane zostały pozyskane \footnote{\url{http://clubelo.com/System}}.
+        
+        Pobieranie danych możliwe było z użyciem wystawionego web API\footnote{\url{http://clubelo.com/API}}, które umożliwiało pobranie pliku CSV, zawierającego historyczne informacje, dla podanej drużyny
+        \subsection{Historyczne dane zakładów piłkarskich} \label{subsec:football-data}
+         \noindent Wspomniane wcześniej dane dotyczące zakładów bukmacherskich meczów piłkarskich okazały się również dobrym źródłem danych, które zawierały informacje umożliwiające weryfikacje zawartości i ewentualnie uzupełnienie tabeli, posiadającej dane o meczach. 
+         
+         \noindent \url{http://www.football-data.co.uk/} udostępnia zestaw plików CSV dla poszczególnych lat wybranych meczów ligowych, w tym Premier League. Poszczególne pola zawarte w plikach opisane są na wspomnianej stronie internetowej\footnote{\url{https://www.football-data.co.uk/englandm.php}} i przy pomocy tych notatek pliki te zostały rozszyfrowane i użyte w procesie uzupełniania tabel o brakujące dane. Informacje takie jak ilość strzałów, celnych goli, żółtych i czerwonych kartek etc. można było znaleźć w tych plikach, oprócz kursów zakładów bukmacherskich dla kilkunastu firm zajmujących się prowadzeniem takich gier hazardowych. Jak wcześniej było wspomniane kursy zakładów, to bardzo dobra cecha dla algorytmów predykcyjnych \cite{EloRating-1}, więc pobranie ich było kluczowe dla lepszej jakości systemu.
+        
         \subsection{Metody agregacji}
+        \noindent Z względu na to że dane pochodziły z różnych źródeł, trzeba było je zebrać i połączyć w odpowiedni sposób w celu otrzymania jednego spójnego zbioru, za pomocą którego można wyciągnąć informacje dla konkretnych rozgrywek. 
+        
+        Pierwszym krokiem było przeniesienie europejskiej baza danych piłkarskich z SQLite do Microsoft SQL Server i odfiltrowanie odpowiednio nieinteresujących danych (np. mecze i zawodnicy pochodzący z innej ligi niż Premier League). Filtrowanie polegało na wyodrębnieniu wszystkich meczy z ligi angielskiej, po czym przepytanie bazy w poszukiwaniu wszystkich zaowdników i drużyn biorących udział w tych rozgrywkach. Po czym zostały usunięte wszystkie inne krotki drużyn i zawodników oraz ich odpowiadających atrybutów. Tak samo mecze spoza ligi angielskiej zostały usunięte z bazy. Po wykonaniu wszystkich operacji, powstała kopia zapasowa bazy, która znajduje się na repozytorium projektu \cite{repo}, w folderze \textbackslash DataProjects\textbackslash MatchPredictDataImporter w pliku o nazwie \textit{Kaggle\_filtered.bacpac}, a przygotowana instancja została udostępniona na portalu Azure Cloud.
+        
+        Poza bazą danych zostały jeszcze dwa zbiory danych, które miały posłużyć do uzupełnienia utworzonego zestawu. W tym celu powstała solucja napisana w języku C\# przy użyciu framework'u  .Net Core w wersji 3.0 nazwana \textit{Soccer Data Importer} . Działa ona w dwóch trybach:
+        \begin{itemize}
+            \item EloRatingImport - pobierany z web API Elo rating dla przekazanych w pliku nazw drużyn i wstawienie ich do bazy danych do wcześniej przygotowanej tabeli EloRating. Łączenie z drużynami odbywa się po znalezieniu unikalnej drużyny z podanymi nazwami. Każda z drużyn posiada wiele wpisów w tabeli EloRating z względu na to że odnoszą się one do innych momentów w czasie. 
+            \item KaggleFootballDataMerge - uzupełnienie danych w tabeli Match, przy pomocy pobranych ręcznie plików CSV z serwisu \url{http://www.football-data.co.uk/}. Niektóre pola wymagały wypełnienia, ponieważ nie zawierały one poprawnych danych dla statystyk poszczególnych drużyn podczas rozgrywki (np. liczba strzałów czy faulów). Połączenia między wartościami z pliku CSV, a wpisami w bazie były możliwe tylko wtedy, gdy mecz dla danej daty i pary drużyn występował w obu źródłach. Potwierdziło prawdziwość danych, ponieważ dwa różne źródła się ze sobą pokrywały.
+        \end{itemize}
+        
+        Wszelkie operacje na bazie danych, czy to pobieranie danych, czy ładowane wykonywane są przy pomocy biblioteki \textit{Entity Framework Core}, która diametralnie ułatwia zadanie. Dzięki niej korzystając z dyrektyw języka C\# można operować na tabelach jak na klasach zdefiniowanych w projekcie bez konieczności pisania zapytań w języku SQL.
+        
+        Głównym problemem z importem danych z różnych źródeł była różnica w sposobie nazewnictwa drużyn. Jedynym sposobem na zidentyfikowanie drużyny dla przykładowo podpięcia do niej wartości Elo rating była jej nazwa. Jednak zespoły w przygotowanej bazie miały pełne nazwy (np. Manchester United), a aby pobrać Elo rating trzeba było wpisać specyficzną nazwę (np. dla drużyny Manchester United było to ManUnited). Spowodowało to konieczność ręcznego sprawdzenia każdej z drużyn i wpisaniu odpowiedniego mapowania do pliku podawanego na wejściu aplikacji. Taka sytuacja występowała zarówna dla trybu EloRatingImport jak i KaggleFottballDataMerge, oba posiadały różne mapowania nazw.
+        
+        Solucja została przetestowana przy pomocy testów jednostkowych przy wykorzystaniu biblioteki \textit{NUnit}, w celu zagwarantowania poprawności działania operacji.
+        
+        ~
+        
+        Całe rozwiązanie definiującą aplikacje konsolową można znaleźć na repozytorium projektu \cite{repo} w folderze \textbackslash DataProjects\textbackslash MatchPredictDataImporter.
+        
+        
     \section{Web API}
+    \noindent
+    Posiadając dane w bazie danych gotowe do użycia, zostało utworzenie wygodnego sposobu ich pobrania, w tym celu powstała solucja o nazwie \textit{Soccer Predict Data Provider}. Jak wspomniane w rozdziale \ref{arch:webApi} jest to web API utworzone w technologii \textit{Azure Function}, które wystawia dwa punkty końcowe. 
+    
+    Pierwsze pomysły zakładały dużą ilość pobierania drobnymi żądaniami, czyli np. zapytanie o mecze w danym sezonie, ale aby uzyskać szczegóły zawodników należało wykonać osobne żądanie dla każdego z osobna. Szybko okazało się to nieefektywne przez co przeszliśmy do innego podejścia.
+    
+    Wnioskiem nasuwającym się z poprzedniego pomysłu było pobieranie dużej ilości danych przy jednym zapytaniu, tj. mecze w danym sezonie wraz z wszystkimi możliwymi szczegółami, czyli każdy zawodnik i drużyna obecna w meczu przy jednym żądaniu. Z względu na złożone zapytania skończyło się to długim czasem oczekiwania na odpowiedź (ok 20 minut per sezon). Jedyną optymalizacją było dodanie indeksów na kluczach obcych, po których były często wykonywane łączenia, jednak nie spowodowało to widocznej poprawy. 
+    
+    Do tego samego punktu końcowego została dodana historia dla rozgrywających mecz drużyn, czyli określona przez parametr liczba meczy wstecz dla obu zespołów. Diametralnie wydłużyło to czas trwania zapytania co spowodowało konieczność przemyślenia sposobu pobierania danych aby nie wykonywać zbyt wielu niepotrzebnych zapytań do bazy danych.
+    
+    W celu minimalizacji zapytań, mecze wraz z drużynami i ich atrybutami są pobierane jednorazowo dla danego sezonu, po czym są wykorzystywane ponownie w celu poszukiwań przeszłych meczy. Jeżeli wśród pobranych rozgrywek nie znajduję się wystarczająca liczba historycznych meczy, są one dodatkowo pobierane jednorazowo. Należy dodać że mecze historyczne nie zawierają szczegółów, tylko i wyłącznie posiadają dane dotyczące wyników i innych statystyk meczu.
+    
+    Na potrzeby budowania cech dodana została również historia bezpośrednich rozgrywek między drużynami w analizowanym meczu i w podobny sposób zostaje obliczona jednorazowo dla każdej pary drużyn i wykorzystywana ponownie bez wykonywania zapytań. Kolejną dodaną informacją do żądania jest liczba punktów w poprzednim sezonie (jeśli jest dostępna). Obliczenie tej wartości wymaga wykonania zapytania, aby pobrać mecze z poprzedniego sezonu dla badanej drużyny, więc w celu ich minimalizacji zachowujemy wartość punktów w poprzednim sezonie w słowniku, przez co można ją wykorzystać, gdy dana drużyna pojawi się ponownie w innych meczach pobieranego sezonu.
+    
+    Wszelkie zabiegi optymalizacyjne doprowadził do żądań trwających ok. 2 minut, co zostało uznane za akceptowalny czas oczekiwania.
+    
+    \begin{figure}[H] 
+        \centering\includegraphics[width=5cm,height=10cm]{figures/example_response.png}
+        \caption{Przykład odpowiedzi dla punktów końcowych web API}
+        \label{fig:example_API_response}
+    \end{figure}
+    
+    Na rysunku \ref{fig:example_API_response} można zauważyć sparsowany obiekt w formacie json, zwracany przez dostępne punkty końcowe. Jest to lista sformatowanych danych z tabel posiadająca następujące pola:
+    \begin{itemize}
+        \item MatchDetails - zrzut krotki z tabeli 'Match'.
+
+        \item HomeTeam - obiekt zawierający szczegóły drużyny gospodarzy znane przed zagranym meczem(krotka z tabeli 'Team'), w tym jej atrybuty (krotka z tabeli 'Team\_Attributes' dotycząca danej drużyny), liczba zagranych sezonów oraz liczba punktów w poprzednim sezonie.
+        \item AwayTeam - obiekt zawierający szczegóły drużyny gości, zawartość taka sama jak w przypadku drużyny gospodarzy.
+        \item HomeTeamHistory - klasa zawierająca listę meczy, zagranych przez drużynę gospodarzy w przeszłości.
+        \item AwayTeamHistory - klasa zawierająca listę meczy, zagranych przez drużynę gości w przeszłości.
+        \item PastEncounters - lista bezpośrednich starć drużyn grających w badanym meczu.
+    \end{itemize}
+    
+    Interfejsy budujące odpowiedzi na żądania zostały przetestowane testami jednostkowymi w celu upewnienia się, że każdy element poprawnie łączy ze sobą obiekty i zwraca oczekiwany wynik. Tak jak w przypadku projektu \textit{Soccer Predict Data Importer} wykorzystana zostałą biblioteka \textit{NUnit} języka C\#.
+    
+    Solucje zawierającą definicje web API można znaleźć na repozytorium projektu \cite{repo} w folderze \textbackslash DataProjects\textbackslash MatchPredictorDataProvider.
+    
     \section{Wizualizacja charakterystyk danych}
     \noindent Przed przystąpieniem do właściwego przetwarzania danych i tworzenia na ich podstawie cech, warto bliżej im się przyjrzeć w celu potwierdzenia ich prawidłowości i wyszukania potencjalnych błędów i braków. Ten podrozdział poświęcony jest wizualizacji charakterystyk danych, które posiadamy w naszej bazie. Wizualizacja została dokonana w \emph{Jupyter Notebook}, a jej plik źródłowy znajduje się w repozytorium projektu~\cite{repo} w folderze \texttt{visualization/} pod nazwą \texttt{visualization.ipynb}
     
@@ -232,7 +308,7 @@
         \label{fig:preprocessing_structure}
     \end{figure}
     
-    Oprócz podfolderu \texttt{test/} (który zostanie szczegółowo omówiony w późniejszym podrozdziale), przechowującego wszystkie testy jednostkowe, znajdują się w nim też właściwe pliki odpowiedzialne za wspomniane funkcje modułu:
+    Oprócz podfolderu \texttt{test/} (który zostanie szczegółowo omówiony w późniejszym podrozdziale) przechowującego wszystkie testy jednostkowe, znajdują się w nim też właściwe pliki odpowiedzialne za wspomniane funkcje modułu:
     
     \begin{itemize}
         \item \texttt{api.py}- plik zawierający funkcje pomocnicze do tworzenia odpowiedniego url'a, przy pomocy którego następuje wysłanie zapytanie do serwera,
@@ -287,8 +363,19 @@
     
         
         
-        \subsection{Tworzenie zbioru cech (TBC)}
-        \noindent Zbiór cech jest jednym z kluczowych czynników, które wpływają na jakość algorytmów uczenia maszynowego. Odpowiedni dobór oraz selekcja i segregacja to droga do uzyskania dobrej predykcji. Jednak wybór odpowiednich cech nie jest łatwym zadaniem i zazwyczaj zajmuje on dużo czasu i zasobów. Także w naszym problemie, dobór cech był starannie dokonany. Piłka nożna do bardzo rozbudowana gra i z jednej partii między drużynami można wyciągnąć nieskończoną ilość danych, poprzez najbardziej oczywiste jak liczba strzałów, po te mniej jak ilość minut spędzonych na swojej połowie przez danego gracza lub średni wiek piłkarza w danej drużynie. Z racji, że posiadaliśmy dość rozbudowaną bazę pochodzącą z różnych źródeł, ostatecznie wybraliśmy 30 cech, które odpowiednio zagregowaliśmy a następnie przekazaliśmy na wejście naszych algorytmów uczenia maszynowego. Lista tych cech wraz z ich krótkim wyjaśnieniem:
+        \subsection{Tworzenie zbioru cech}
+        Dane, które otrzymywane są z serwera po wykonaniu zapytania, mają format pliku \emph{JSON}. W celu ułatwienia przetwarzania, klientowi zwracane są dane w postaci obiektu \emph{pandas.DataFrame}. Za konwersję danych odpowiedzialna jest klasa \emph{Preprocessor} z pliku \texttt{preprocessor.py}. Oprócz samej konwersji, klasa ta odpowiada też za reprezentację każdego meczu jako wektora cech, którego wartości oblicza na podstawie surowych danych otrzymanych z serwera.
+        
+        \begin{lstlisting}[language=Python, label={lis:preprocessor}, caption=Obliczanie  wartości cechy \emph{home\_team\_score}]
+            def __calculate_team_score(self, attr):
+                attributes = [attr.BuildUpPlaySpeed, attr.BuildUpPlayPassing, attr.ChanceCreationPassing, attr.ChanceCreationCrossing, attr.ChanceCreationShooting, attr.DefencePressure, attr.DefenceAggression, attr.DefenceTeamWidth]
+                attributes = [attr for attr in attributes if attr]
+                return round(sum(attributes) / len(attributes), 2)
+        \end{lstlisting}
+        
+        Na listingu \ref{lis:preprocessor} przedstawiona jest jedna z funkcji z klasy \emph{Preprocessor}, która oblicza wartość cechy modelującej siłę danej drużyny na podstawie pewnych wartości pozyskanych z gry Fifa. Oblicza ich średnią arytmetyczną i zaokrągla wynik do dwóch miejsc po przecinku.
+        
+        Ponieważ dostępna jest rozbudowana baza danych, ostatecznie wybrano 30 różnych cech. Taka liczba powoduje, że klient biblioteki będzie mógł dokonać dalszej ich filtracji przed użyciem ich podczas implementacji algorytmów uczenia maszynowego w celu wyszukania tych o największym znaczeniu. Tak prezentuje się lista tych cech wraz z ich krótkim wyjaśnieniem:
         
         \begin{itemize}
             \item \emph{avg\_away\_win\_odds}, \emph{avg\_home\_win\_odds}, \emph{avg\_draw\_odds}: średnia wartość kursów oferowanych na zwycięstwo danej drużyny, remis oraz wygraną drugiej drużyny,
@@ -309,16 +396,16 @@
             \item \emph{direct\_draws}: liczba remisów drużyny gościa z drużyną gospodarzy w ostatnich X meczach rozgrywanych przeciwko sobie. 
         \end{itemize}   
         
-        \noindent Parametr X jest parametrem, który można określić przy inicjowaniu ładowania danych przy pomocy obiektu \emph{Parameters}.
+        Parametr X jest parametrem, który można określić podczas inicjacji ładowania danych przy pomocy obiektu \emph{Parameters}.
         
         \subsection{Testowanie jednostkowe}
-        \noindent W module tym testowane są cztery kluczowe pliki przy pomocy testów jednostkowych. Do tego celu została wykorzystana biblioteka \emph{unittest}. Odpowiadające tym plikom testy znajdują się w folderze \texttt{test/} i prezentują się następująco:
+        W module tym testowane są cztery kluczowe pliki przy pomocy testów jednostkowych. Do tego celu została wykorzystana biblioteka \emph{unittest}. Odpowiadające tym plikom testy znajdują się w folderze \texttt{test/} i prezentują się następująco:
         
         \begin{itemize}
-            \item \texttt{test\_api.py} - testuje plik \texttt{api.py} (TBC).
-            \item \texttt{test\_data\_aggregator.py} - testuje plik \texttt{data\_aggregator.py} (TBC).
-            \item \texttt{test\_data\_fetcher.py} - testuje plik \texttt{data\_fetcher.py} (TBC).
-            \item \texttt{test\_preprocessor.py} - testuje plik \texttt{preprocessor.py} (TBC).
+            \item \texttt{test\_api.py} - testuje plik \texttt{api.py}. Sprawdza, czy podając jako parametry pewne sezony otrzymamy odpowiednio sformatowany adres url, który pozwoli pozyskać tylko interesujące dane z serwera.
+            \item \texttt{test\_data\_aggregator.py} - testuje plik \texttt{data\_aggregator.py}. Zadaniem pliku testowanego jest agregacja danych z kilku sezonów w jeden zbiór danych, stąd test ten weryfikuje, czy otrzymany zbiór rzeczywiście zawiera przetworzone dane z tych sezonów, o które było wykonane zapytanie.
+            \item \texttt{test\_data\_fetcher.py} - testuje plik \texttt{data\_fetcher.py}. Plik ten odpowiada za wykonanie faktycznego połączenia z Internetem w celu pobrania danych z serwera, stąd test ten kontroluje, czy faktycznie następuje wysłanie zapytania pod odpowiedni adres. Z uwagi na to, że testy powinny być hermetyczne (nie powinny zależeć od tego, czy serwer działa i czy połączenie z Internetem jest stabilne), używamy tzw. \definicja{atrap obiektów} (\english{mock objects}), które w kontrolowany sposób udają rzeczywiste połączenie. Dzięki temu test ten może pozostać niezależny.
+            \item \texttt{test\_preprocessor.py} - testuje plik \texttt{preprocessor.py}. Zadaniem tego pliku jest transformacja otrzymanych danych w formacie \emph{JSON} na \emph{pandas.DataFrame} oraz obliczenie odpowiednich cech dla każdego meczu, stąd test ten weryfikuje czy taka transformacja rzeczywiście się odbyła i czy poprawnie obliczono cechy reprezentujące każdy mecz.
         \end{itemize}
         
         Testy jednostkowe dają nam pewność, że otrzymywane z tego modułu dane są poprawne - nie zawierają żadnych błędów i braków. Jest to kluczowe, aby zagwarantować poprawność implementacji modeli, które z tych danych będą korzystać.
@@ -394,5 +481,71 @@
                  jądro & rbf \\ \hline
             \end{tabular}
         \end{table}
-        \subsection{Alg3}
-        \subsection{Alg4}
+        \subsection{Regresja logistyczna}
+        Następnym algorytmem, który został poddany fazie testowania, jest algorytm regresji logistycznej. W podejściu tym podobnie jak dla algorytmu SVM skupiono się na znalezieniu najlepszych parametrów modelu poprzez wykorzystanie metody losowego przeszukiwania siatki (\english{Randomized Search CV} \cite{SKcv}), której jako punkt odniesienia w tym przypadku zaaplikowano metrykę \definicja{accuracy} \cite{SKaccuracy}.
+        Parametry regresji logistycznej, które zostały poddane przeszukaniu:\cite{SKLogRegression}
+        \begin{itemize}
+            \item penalty - parametr określający użytą normę (L1 lub L2 \cite{L1L2}) używanej w funkcji kary
+            \item C - współczynnik ten określa odwrotną siłę regularyzacji - w sytuacji, gdy współczynnik ten jest zwiększany nowo stworzone modele będą proste i coraz bardziej niedouczone. Natomiast w sytuacji, gdy współczynnik ten jest zmniejszany implikuje to powstawanie coraz bardziej złożonych modeli, które mają skłonności do przeuczenia się
+            \item fit\_intercept - zmienna, która określa czy stała, nazywana także jako \textit{bias}, powinna zostać dodana do modelu funkcji decyzyjnej
+            \item warm\_start - parametr, który określa czy powinno zostać użyte rozwiązanie poprzedniego wywołania w celu dopasowania się do inicjalizacji i przyspieszenia procesu uczenia
+            \item solver - algorytm wykorzystywany w problemie optymalizacji
+            \item random\_state - parametr wykorzystywany do przetasowania danych
+        \end{itemize}
+        Tabela przedstawiająca wykorzystane do przeszukiwania parametry oraz ich wartości ostateczne:
+        \begin{table}[H]
+        \caption{Parametry modelu regresji logistycznej}
+        \label{tab:params_lr}
+        \centering
+        \begin{tabular}{c c c}
+        \toprule
+            Parametr & Możliwe wartości parametru & Ostateczna wartość \\
+        \midrule
+            penalty & L1, L2 & L2 \\
+            C & 0.2, 0.3, 0.7, 1.0, 1.2, 1.5, 2.0 & 0.7 \\
+            fit\_intercept & True, False & True \\
+            warm\_start & True, False & True \\
+            solver & newton-cg, lbfgs, sag, saga & saga\\
+            random\_state & 10, 20, 40, 41, 42, 46, 50, 51, 56, 60, 70, 80 & 46 \\
+        \bottomrule
+        \end{tabular}
+        \end{table}
+        Oprócz wymienionych parametrów ustawieniu manualnemu zostały poddane następujące parametry:
+        \begin{itemize}
+            \item max\_iter - maksymalna liczba iteracji wykonywanych przez solver podczas procesu \mbox{uczenia -  2000}
+            \item class\_weight - wagi skojarzone z klasami, w wykorzystanym zbiorze każda klasa jest równoliczna, wobec czego wartość dla tego parametru została ustawiona jako - balanced
+            \item multi\_class - parametr określający czy mamy do czynienia z klasyfikacją binarną czy wieloklasową, w przypadku wykorzystywanego modelu jest to klasyfikacja wieloklasowa, wobec czego wartość parametru została ustawiona jako - multinomial
+        \end{itemize}
+        Pozostałe parametry modelu wykorzystują wartości domyślne. Po etapie doboru parametrów i uczenia modelu przy wykorzystaniu odpowiednich wartości następuje przejście do etapu przeprowadzenia predykcji wyników na zbiorze testowym i oceny eksperymentalnej, która zostanie dokonana w rozdziale 6.
+        
+        \newpage
+        
+        \subsection{Las losowy}
+        Ostatnim algorytmem, który postanowiono rozważyć w pracy jest algorytm lasu losowego (\english{Random Forest}). W podejściu tym podobnie jak dla poprzednich dwóch omawianych algorytmów skupiono się na znalezieniu najlepszych parametrów modelu poprzez wykorzystanie metody losowego przeszukiwania siatki(\english{Randomized Search CV}) \cite{SKcv}, której jako punkt odniesienia zaaplikowano metrykę \english{accuracy} \cite{SKaccuracy}. Parametry lasu losowego, które zostały poddane przeszukaniu: \cite{SKRandomForest}
+        \begin{itemize}
+            \item n\_estimators - liczba drzew decyzyjnych w modelu lasu losowego
+            \item criterion - funkcja używana do pomiaru jakości podziału w węźle
+            \item max\_depth - maksymalna wysokość drzewa decyzyjnego
+            \item bootstrap - zmienna, która określa czy do budowy poszczególnego drzewa decyzyjnego ma zostać użyty cały zbiór danych czy jedynie jego wylosowana próbka
+            \item min\_samples\_split - minimalna liczba próbek koniecznych, aby zakwalifikować węzęł drzewa jako liść
+            \item random\_state - parametr, który kontroluje losowość ładowania próbek używanych podczas budowania drzew oraz wpływa na dobór cech przy podziale w każdym węźle
+        \end{itemize}
+        Tabela przedstawiająca wykorzystane do przeszukiwania parametry oraz ich wartości ostateczne:
+        \begin{table}[H]
+        \caption{Parametry modelu regresji logistycznej}
+        \label{tab:params_lr}
+        \centering
+        \begin{tabular}{c c c}
+        \toprule
+            Parametr & Możliwe wartości parametru & Ostateczna wartość \\
+        \midrule
+            n\_estimators & 10, 20, 40, 60, 80, 100, 130, 170 & 80 \\
+            criterion & gini, entropy & entropy \\
+            max\_depth & 5, 6, 10, 15, 20, 30 & 5 \\
+            bootstrap & True, False & True \\
+            min\_samples\_split & 2, 4, 6, 8, 10, 15, 20 & 2\\
+            random\_state & 10, 20, 40, 41, 42, 46, 50, 51, 56, 60, 70, 80 & 40 \\
+        \bottomrule
+        \end{tabular}
+        \end{table}
+        Pozostałe parametry modelu wykorzystują wartości domyślne. Po etapie doboru parametrów i uczenia modelu przy wykorzystaniu odpowiednich wartości następuje przejście do etapu przeprowadzenia predykcji wyników na zbiorze testowym i oceny eksperymentalnej, która zostanie dokonana w rozdziale 6.

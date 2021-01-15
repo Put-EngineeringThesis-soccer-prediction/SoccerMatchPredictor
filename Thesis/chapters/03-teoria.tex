@@ -12,9 +12,17 @@ Zrealizowanie celu tej pracy, który zakłada zbudowanie systemu przewidującego
 
 ~
 
-Po dokonanym przeglądzie prac o podobnej tematyce zauważono pewne interesujące zjawisko. W dużej liczbie prac~\cite{WorldCup-2018}~\cite{EloRating-1}~\cite{Euro2016-1}~\cite{Euro2016-2}~\cite{Euro2016-3} wspominany był ten sam atrybut zwany \emph{EloRating~\footnote{\url{http://clubelo.com/}}}. Jest on pewną miarą przedstawiającą siłę danej drużyny obliczany na podstawie jej wyników z przeszłości. W jednej z tych prac~\cite{EloRating-1} pokazano, że wytrenowany model przy użyciu tylko jednego atrybutu (będącego różnicą wartości \emph{Elo} dla obu drużyn w dniu rozgrywania meczu) przewyższał nawet te modele, które korzystały z około 100 różnych atrybutów. Ustępował tylko tym modelom, które jako atrybuty używały rynkowych kursów bukmacherskich. Pokazuje to, jak potencjalnie dużą wartość podczas predykcji wyniku może mieć wartość \emph{EloRating} (podobnie zresztą jak kursy proponowane przez zakłady bukmacherskie).
+Po dokonanym przeglądzie prac o podobnej tematyce zauważono pewne interesujące zjawisko. W dużej liczbie prac~\cite{WorldCup-2018}~\cite{EloRating-1}~\cite{Euro2016-1}~\cite{Euro2016-2}~\cite{Euro2016-3} wspominany był ten sam atrybut nazywany \emph{EloRating~\footnote{\url{http://clubelo.com/}}}. Jest on  miarą przedstawiającą siłę danej drużyny obliczany na podstawie jej wyników z przeszłości. W jednej z tych prac~\cite{EloRating-1} pokazano, że wytrenowany model przy użyciu tylko jednego atrybutu (będącego różnicą wartości \emph{Elo} dla obu drużyn w dniu rozgrywania meczu) przewyższał nawet te modele, które korzystały z około 100 różnych bardziej podstawowych atrybutów. Ustępował tylko tym modelom, które jako atrybuty używały rynkowych kursów bukmacherskich. Pokazuje to, jak potencjalnie dużą wartość podczas predykcji wyniku może mieć wartość \emph{EloRating} (podobnie zresztą jak kursy proponowane przez zakłady bukmacherskie).
 
 Na podstawie wyników i wniosków z przytoczonych artykułów, w pracy tej, podczas trenowania modeli, zdecydowano się wykorzystać zarówno atrybut \emph{EloRating} jak i rynkowe kursy bukmacherskie ze względu na ich udowodnioną skuteczność podczas predykcji. Metody na pozyskiwanie tych atrybutów zostaną szczegółowo przedstawione w rozdziale \ref{data_aggregation}.
+
+Przegląd prac nie tylko posłużył do wstępnej selekcji możliwych do wykorzystania w algorytmie cech, ale także stanowił podstawę inspiracji do wyboru algorytmów wykorzystanych w niniejszej pracy. 
+
+Najczęściej przejawiającym się algorytmem w analizowanych artykułach naukowych był Losowy Las drzew, tj. Random Forest \cite{CanMLPrecict} \cite{KagglePredict} \cite{BundesligaPredict} \cite{TowardDataPredict}, co ukierunkowało naturalny wybór przetestowania tego algorytmu w opisywanej pracy. Warto wspomnieć, że charakteryzował się także wysokimi wynikami predykcji w stosunku do innych algorytmów opisywanych w tych pracach. Dalszy wybór algorytmów do testowania wskazał na algorytm regresji logistycznej i algorytm metody wektorów wspierających (czyli SVM), które także w analizowanych pracach badawczych \cite{CanMLPrecict} \cite{KagglePredict} prowadziły do  obiecujących wyników. Standardowe implementacje powyższych algorytmów dostępne są w wielu popularnych bibliotekach. Jednak, w celu nie ograniczania się jedynie do metod zaimplementowanych w gotowej do użycia bibliotece \textit{scikit-learn} rozszerzono obszar zainteresowania o własną specjalnie zaimplementowaną sieć neuronową \cite{CanMLPrecict} \cite{BundesligaPredict} w oparciu o wykorzystanie modułów z biblioteki \textit{TensorFlow}. 
+
+Ponadto z uwagi na niezbalansowanie rozkładu wyników meczów w klasach, zainteresowano się możliwością wykorzystania specjalizowanych uogólnień klasyfikatorów lub metod tzw. prze-losowanie w trakcie przetwarzania wstępnego.
+
+Wykorzystane algorytmy szczegółowo zostaną przedstawione w rozdziale 3.3.
 
 \section{Bazy danych i API}
 Podstawą uczenia maszynowego są dane na których algorytmy mogą się uczyć, dlatego jednym z postawionych problemów było miejsce przechowywania danych jak i sposób ich pobierania.
@@ -28,7 +36,7 @@ RBD jest zbiorem tabel, z których każda ma za zadanie reprezentować różne e
         \caption{Przykładowy schemat relacji encji relacyjnej bazy danych.}\label{example-Entity}
 \end{figure}
 
-Powodem dla którego nazywamy to relacyjną bazą danych jest możliwość wstawienia odnośnika jako kolumne, który wskazuje na rząd w innej tabeli. Patrząc na przykładowy schemat \ref{example-Entity}, można zauważyć, że kolumny \textit{TeamA\_Id} oraz \textit{TeamB\_Id} z tabeli \textit{Mecz}, odnoszą się do wartości w tabeli \textit{Drużyna}. Wartości w kolumnach, odwołujące się do innych tabel nazywamy \textit{kluczami obcymi}. \cite{Relational_Databases_Milan}
+Powodem dla którego nazywa się to relacyjną bazą danych jest możliwość wstawienia odnośnika jako kolumne, który wskazuje na rząd w innej tabeli. Patrząc na przykładowy schemat \ref{example-Entity}, można zauważyć, że kolumny \textit{TeamA\_Id} oraz \textit{TeamB\_Id} z tabeli \textit{Mecz}, odnoszą się do wartości w tabeli \textit{Drużyna}. Wartości w kolumnach, odwołujące się do innych tabel nazywamy \textit{kluczami obcymi}. \cite{Relational_Databases_Milan}
 
 Obecnie istnieje duża ilość oprogramowania, umożliwiającego zarządzanie takimi bazami danych, np. \textit{Microsoft SQL Server} czy \textit{PostgreSql}, lecz wszystkie sprowadzają się do ujednoliconego standardu ISO \cite{SQL_ISO}. Zdefiniowane są tam zasady, jaką RBD powinny mieć strukturę oraz jakie typy danych zawierają. W pracy zostały użyte ze względu na łatwość dostępu do narzędzi oraz możliwości utworzenia instancji na chmurze, korzystając z Azure Cloud.
 
@@ -44,27 +52,30 @@ Użycie WebAPI jako sposobu udostępniania danych umożliwia nam wstępnie zagre
 
 Jednym z kluczowych aspektów mocno wpływających na powodzenie każdego projektu związanego z uczeniem maszynowym jest stworzenie odpowiedniego zbioru cech (\english{features}) na podstawie poprawnie przygotowanych danych. W kontekście uczenia maszynowego, cecha to indywidualna, mierzalna własność lub charakterystyka pewnego obserwowanego zjawiska~\cite{Wiki:Feature}. W przypadku modelu przewidującego wyniki meczów piłkarskich, przykładem cechy może być liczba żółtych kartek uzyskanych przez drużynę gospodarzy w ostatnim meczu lub średni procent posiadania piłki drużyny gości w meczach obecnego sezonu.
 
-Metody zbioru danych są bardzo często automatyzowane i pozbawione ścisłej kontroli, stąd mogą one zawierać różnego rodzaju błędy, takie jak wartości spoza zakresu (np. wiek: -20), niemożliwe kombinacje wartości (płeć: mężczyzna, w ciąży: tak) lub pominięte atrybuty dla niektórych rekordów. Ważne jest, aby takie błędy wychwycić już na etapie wstępnego przetwarzania i nie dopuścić ich do danych wejściowych algorytmów. Pomocna może się tutaj okazać wizualizacja dokonana w celu bliższego zapoznania się z danymi. Dla atrybutów można wizualizować rozkład ich wartości przy pomocy histogramów lub wypisywać ich podstawowe statystyki (m.in. średnie, mediany, wartości minimalne, maksymalne) w celu weryfikacji poprawności ich zakresów i typów.
+Metody konstruowania zbioru danych są często automatyzowane lecz wtedy  pozbawione ścisłej kontroli, stąd mogą one zawierać różnego rodzaju błędy, takie jak wartości spoza zakresu (np. wiek: -20), nierealistyczne kombinacje wartości (płeć: mężczyzna, w ciąży: tak) lub pominięte atrybuty dla niektórych rekordów. Ważne jest, aby takie błędy wychwycić już na etapie wstępnego przetwarzania i nie dopuścić ich do danych wejściowych dla algorytmów uczących się. Pomocna może się tutaj okazać wizualizacja dokonana w celu tzw. eksploracyjnej analizie danych. Przykładowo dla atrybutów można wizualizować rozkład ich wartości przy pomocy histogramów lub wypisywać ich podstawowe statystyki (m.in. średnie, mediany, wartości minimalne, maksymalne) w celu weryfikacji poprawności ich zakresów i typów.
 
-System będzie w stanie nauczyć się przewidywać wyniki tylko mając do dyspozycji jak najwięcej znaczących cech i jak najmniej tych mało znaczących. Zgodnie z popularnym angielskim zwrotem w obszarze przetwarzania informacji -  \definicja{śmieci na wejściu – śmieci na wyjściu} (\english{Garbage In, Garbage Out, GIGO}), nawet skuteczny i poprawnie działający program w przypadku otrzymania na wejściu błędnych danych, da na wyjściu niepoprawne oraz mało użyteczne wyniki, stąd tak ważne jest uprzednie przygotowanie danych.
+W ogólności można oczekiwać, że system będzie w stanie nauczyć się przewidywać wyniki tylko mając do dyspozycji jak najwięcej znaczących cech i jak najmniej tych mało znaczących. Zgodnie z popularnym angielskim zwrotem w obszarze przetwarzania informacji i analizie danych -  \definicja{śmieci na wejściu – śmieci na wyjściu} (\english{Garbage In, Garbage Out, GIGO}), nawet skuteczny i poprawnie działający program w przypadku otrzymania na wejściu błędnych danych, da na wyjściu niepoprawne oraz mało użyteczne wyniki, stąd tak ważne jest uprzednie przygotowanie danych.
 
-Wstępne przetwarzanie (\english{preprocessing}) w naszym systemie składa się z jednorazowego dokonania wizualizacji posiadanych przez nas danych (która będzie szczegółowo przedstawiona w późniejszym rozdziale) w celu pogłębienia wiedzy na ich temat i wyszukania potencjalnych braków lub błędów. Następnym zadaniem, wykonywanym każdorazowo przy tworzeniu zbioru danych, którego przeznaczeniem jest użycie podczas testowania różnego rodzaju algorytmów, jest pobranie interesujących danych z bazy, przetworzenie ich, czyli poradzenie sobie z m.in. wartościami pustymi i stworzenie na ich podstawie wektora cech dla każdego rekordu (w przypadku naszego systemu jest to pojedynczy mecz). 
+Wstępne przetwarzanie (\english{preprocessing}) w projektowanym systemie składa się z jednorazowego dokonania wizualizacji posiadanych danych (która będzie szczegółowo przedstawiona w późniejszym rozdziale) w celu pogłębienia wiedzy na ich temat i wyszukania potencjalnych braków lub błędów. Następnym zadaniem, wykonywanym każdorazowo przy tworzeniu zbioru danych, którego przeznaczeniem jest użycie podczas testowania różnego rodzaju algorytmów, jest pobranie interesujących danych z bazy, przetworzenie ich, czyli poradzenie sobie z m.in. wartościami pustymi i stworzenie na ich podstawie wektora cech dla każdego rekordu (w przypadku naszego systemu jest to pojedynczy mecz). \textbf{Częstymi metodami na ...???}  
 
-Wynikiem etapu wstępnego przetwarzania jest tzw. zbiór treningowy (\english{training set}), którego znaczenie zostanie przybliżone w podrozdziale traktującym o algorytmach uczenia maszynowego.
+Wynikiem etapu wstępnego przetwarzania jest tzw. zbiór treningowy (\english{training set}), który zostanie omówiony w podrozdziale traktującym o algorytmach uczenia maszynowego.
 
 \section{Algorytmy uczenia maszynowego}
-Uczeniem maszynowym nazywany dziedzinę nauki (i sztukę) programowania komputerów w sposób umożliwiający im \textbf{uczenie się z danych}. \cite{Geron} Nieodłącznym elementami związanymi z tą dziedziną są takie pojęcia jak: 
+Uczeniem maszynowym nazywa się grupę metod informatyki umożliwiające automatycznie \textbf{uczenie się z danych / przykładów historycznych} tak aby działać lepiej na nowych a podobnych przykładach \cite{Geron}. %Nieodłącznym elementami związanymi z tą dziedziną są takie pojęcia jak:
+
+Uczenie tego rodzaju wymaga przetwarzania dwóch rodzajów danych:
+
 \begin{itemize}
-    \item zbiór treningowy (\english{training set}) - zbiór uczący zawierający dane używane do trenowania stworzonego przez nas sytemu
+    \item zbiór treningowy (\english{training set}) - zbiór uczący zawierający dane używane do trenowania stworzonego przez nas sytemu (algorytmu uczącego się)
     \item zbiór testowy (\english{test set}) - zbiór zawierający część danych, na których dokonywana jest predykcja odpowiednich wartości przez skonstruowany system.
 \end{itemize}
-Warto podkreślić, że dane zawierające się w zbiorze testowym nie występują w zbiorze treningowym, co daje nam pewność, że algorytm nie będzie miał wcześniej do czynienia z danymi, na których ma wykonać predykcję aniżeli dopiero na etapie tejże predykcji.
+Warto podkreślić, że dane zawierające się w zbiorze testowym nie występują w zbiorze treningowym, co daje nam pewność, że algorytm nie będzie miał wcześniej do czynienia z danymi, na których ma wykonać predykcję aniżeli dopiero na etapie tejże predykcji. Wiąże się to z oceną możliwości uogólniania systemów uczących się, 
 
 Istnieje wiele typów uczenia maszynowego, że warto podzielić je na ogólne kategorie na podstawie takich czynników, jak:
 \begin{itemize}
     \item nadzór człowieka w procesie trenowania (uczenie nadzorowane, nienadzorowane, półnadzorowane i uczenie przez wzmacnianie)
     \item możliwość uczenia się w czasie rzeczywistym (uczenie przyrostowe i wsadowe)
-    \item sposób pracy: proste porównywanie punktów danych ze znanymi punktami lub, podobnie do naukowców, wykrywanie wzorców w danych uczących i tworzenie modelu predykcyjnego (uczenie z przykładów i uczenie z modelu)
+    \item sposób pracy: proste porównywanie punktów danych (onserwacji, przykładów) ze znanymi innymi punktami lub, podobnie do naukowców, wykrywanie wzorców w danych uczących i tworzenie modelu predykcyjnego (uczenie z przykładów i uczenie z modelu)
 \end{itemize}
 
 Konstruowany system do predykcji wyniku meczu piłkarskiego jest przykładem systemu wykorzystującego uczenie nadzorowane. W uczeniu nadzorowanym (\english{supervised learning}) dane uczące przekazywane algorytmowi (wektor cech nt. danego meczu) zawierają dołączone rozwiązania problemu, tzw. etykiety (\english{labels}) (wynik danego meczu). \cite{Geron}
@@ -77,26 +88,35 @@ Konstruowany system do predykcji wyniku meczu piłkarskiego jest przykładem sys
 \newpage
 
 \subsection{Regresja Logistyczna}
-\definicja{Regresja logistyczna} (\english{Logistic Regression}) - jedna z powszechnie używanych metod klasyfikacji. Klasyfikacja ta może być użyta, gdy próbka przypisywana jest do jednej z dwóch klas (klasyfikacja binarna) \cite{PPlonski}. Istnieją także rozszerzone modele regresji logistycznej obsługujące możliwą predykcję do więcej niż dwóch klas (klasyfikacja wieloklasowa). Regresja logistyczna oparta jest o specyficzny system prawdopodobieństw i funkcji sigmoidalnej, na podstawie której wyznaczana jest przynależność danej obserwacji do odpowiedniej klasy.
+\definicja{Regresja logistyczna} (\english{Logistic Regression}) - jedna z powszechnie używanych metod klasyfikacji. Klasyfikacja ta może być użyta, gdy przykład przypisywany jest do jednej z dwóch klas (klasyfikacja binarna) \cite{PPlonski}. Istnieją także rozszerzone modele regresji logistycznej obsługujące możliwą predykcję do więcej niż dwóch klas (klasyfikacja wieloklasowa). Regresja logistyczna oparta jest o specyficzny system prawdopodobieństw i funkcji sigmoidalnej, na podstawie której wyznaczana jest przynależność danej obserwacji do odpowiedniej klasy.\\
 
-Funkcja sigmoidalna opisana jest następującym wzorem:
+Prawdopodobieństwo wynikowe przynależności danej obserwacji do podanej klasy możemy wyrazić za pomocą następującego wzoru:
 \begin{equation}
-    f(z) = \frac{1}{1 + \exp^{-(az + b)}}
+    P(Y|x) = \frac{\exp^{(az + b)}}{1 + \exp^{(az + b)}}
 \end{equation}
 
 gdzie:
 \begin{itemize}
-    \item z - wektor zmiennych niezależnych dla danej obserwacji
-    \item a - wektor zawierający wagi dla odpowiednich cech
+    \item z - zmienna niezależna (\textit{i-ta})
+    \item a - współczynnik regresji logistycznej dla \textit{i-tej} zmiennej niezależnej
     \item b - stała regresji zapewniająca przesunięcie hiperpłaszczyzny decyzyjnej klasyfikatora w przestrzeni wag
 \end{itemize}
 
+
+Wyrażenie $\exp^{(az + b)}$ określono jako szansę i jest to stosunek prawdopodobieństwa sukcesu do prawdopodobieństwa porażki. Klasyczne prawdopodobieństwo wyrażone jako stosunek liczby sukcesów do liczby wszystkich prób przyjmuje wartości z zakresu (0;1), natomiast szansa ma tę zaletę, że przyjmuje wartości z zakresu $(0;\infty)$, co przekłada się na fakt, że logarytm szansy przyjmuje wartości z zakresu $(-\infty;\infty)$ \cite{Hosmer}. Funkcję przekształcająca prawdopodobieństwo na logarytm szansy nazywana jest funkcją sigmoidalną, która opisana jest następującym wzorem:\\
+
+\begin{equation}
+    f(z) = \frac{1}{1 + \exp^{-(az + b)}}
+\end{equation}
+
+
 \begin{figure}[h] 
         \centering\includegraphics[width=15cm]{figures/sigmoidFunc.JPG}
-        \caption{Krzywa regresji logistycznej \cite{MGrzyb}}
+        \caption{Krzywa regresji logistycznej - funkcja sigmoidalna \cite{MGrzyb}}
 \end{figure}
 
-Jak możemy zauważyć z powyższego wykresu funkcja sigmoidalna daje wynik ciągły, który następnie sprowadzany jest do wyniku binarnego:
+\newpage
+Z powyższego wzoru można zauważyć, że funkcja sigmoidalna daje wynik ciągły, który następnie sprowadzany jest do wyniku binarnego:
 
 \[
 y = 
@@ -108,7 +128,12 @@ y =
 
 \newpage
 \subsection{Las losowy}
-\definicja{Las losowy} (\english{Random Forest}) - zbiór klasyfikatorów (\english{ensemble classifier}), w którym każdy pojedynczy klasyfikator jest drzewem decyzyjnym uczonym bez zatrzymywania \cite{PPlonski}. Aby zrozumieć ideę lasu losowego musimy najpierw zrozumieć ideę drzewa decyzyjnego. Drzewa decyzyjne (\english{decision trees}) opierają się o drzewiastą strukturę. Proces klasyfikacyjny budowany jest w sposób iteracyjny począwszy od korzenia aż do liści. W kolejnych iteracjach dodawane są węzły składające się z odpowiednio dobranych atrybutów. Atrybuty są wybierane przez tzw. algorytm wyboru cech, w kolejności mającej zmaksymalizować zysk informacyjny z danego węzła. Cały proces ma swój koniec w momencie, gdy wszystkie liście są w tej samej klasie lub gdy zabraknie klas do podziału. Budując pełne drzewo decyzyjne istnieje duże prawdopodobieństwo nadmiernego dopasowania algorytmu, co jest częstym problemem w przypadku podstawowej wersji drzewa decyzyjnego. \cite{MGrzyb}\\
+\definicja{Las losowy} (\english{Random Forest}) - zbiór klasyfikatorów (\english{ensemble classifier}), w którym każdy pojedynczy klasyfikator jest drzewem decyzyjnym uczonym bez zatrzymywania - pruningu \cite{PPlonski}. W celu zrozumienia zasady lasu losowego trzeba najpierw zrozumieć ideę drzewa decyzyjnego. Drzewa decyzyjne (\english{decision trees}) opierają się o drzewiastą strukturę. Proces klasyfikacyjny budowany jest w sposób iteracyjny począwszy od korzenia aż do liści. W kolejnych iteracjach dodawane są węzły składające się z odpowiednio dobranych atrybutów. Atrybuty są wybierane przez tzw. miary oceny atrybutów, w kolejności mającej zmaksymalizować zysk informacyjny z danego węzła (najczęściej wykorzystujący entropię informacji). Do najpopularniejszymi algorytmów wyboru cech można zaliczyć takie algorytmy jak \cite{DrzewoAlg}:
+\begin{itemize}
+    \item Algorytm CART (\english{Classification and Regression Tree}) - w algorytmie tym wykorzystano tzw indeks Gini'ego (\english{Gini's index}) oraz specyficzną metodę redukcji rozmiarów - pruning
+    \item Algorytm C4.5 - w algorytmie tym wykorzystano wzasadył podziału opartych na entropii, m.in. reguła względnego zysku (\english{gain ratio}) zwana także współczynnikiem przyrostu informacji oraz pesymistyczne podejście do redukcji.
+\end{itemize}
+Cały proces ma swój koniec w momencie, gdy wszystkie przykłady uczące w liściu są przypisane do tej samej klasie lub gdy zabraknie klas do podziału. Budując pełne drzewo decyzyjne istnieje duże prawdopodobieństwo nadmiernego dopasowania algorytmu, co jest częstym problemem w przypadku podstawowej wersji drzewa decyzyjnego. \cite{MGrzyb}, dlatego rozważano metody redukcji ich rozmiarów.\\
 
 Przykładowy model drzewa decyzyjnego:
 \begin{figure}[h] 
@@ -116,16 +141,16 @@ Przykładowy model drzewa decyzyjnego:
         \caption{Przykładowy model drzewa decyzyjnego}
 \end{figure}
 
-Na podstawie powyższego modelu jesteśmy w stanie przeprowadzić proste wnioskowanie decyzjne. Załóżmy, że nasza obserwacja wyróżnia się następującymi atrybutami:
+Na podstawie powyższego modelu zostanie przeprowadzone proste wnioskowanie decyzyjne. Zostało założone, że obserwacja wyróżnia się następującymi atrybutami:
 \begin{itemize}
     \item Średnia wieku piłkarzy - 25.4 lat
     \item Mecz rozgrywany na własnym stadionie - Nie
 \end{itemize}
-Znamy wartości wszystkich potrzebnych do wnioskowania atrybutów wobec czego jesteśmy w stanie rozpocząć proces predykcji rozpoczynając wnioskowanie od korzenia. Średnia wieku piłkarzy jest mniejsza jak 30 lat, wobec czego trafiamy do lewej gałęzi drzewa. Kolejno sprawdzamy czy badany przez nas mecz jest rozgrywany na własnym stadionie - według badanej obserwacji mecz jest rozgrywany na wyjeździe w związku z czym odpowiadamy, że nie i kierujemy się prawą gałęzią drzewa. W tym momencie dochodzimy do liścia z etykietą ,,Remis'', która to etykieta jest naszą ostateczną predykcją wyniku meczu na podstawie wnioskowania w tym drzewie decyzyjnym.\\
+Wartości wszystkich potrzebnych do wnioskowania atrybutów są znane, wobec czego proces predykcji jest w stanie się rozpocząć zaczynając wnioskowanie od korzenia. Średnia wieku piłkarzy jest mniejsza niż 30 lat, wobec czego proces kieruje się do lewej gałęzi drzewa. Kolejno sprawdzony zostaje fakt czy badany przez nas mecz jest rozgrywany na własnym stadionie - według badanej obserwacji mecz jest rozgrywany na wyjeździe w związku z czym odpowiedź jest przecząca i proces kieruje się prawą gałęzią drzewa. W tym momencie proces dochodzi do liścia z etykietą ,,Remis'', która to etykieta jest ostateczną predykcją wyniku meczu na podstawie wnioskowania w tym drzewie decyzyjnym.\\
 
-Rozumiejąc ideę drzewa decyzyjnego jesteśmy w stanie przejść do omówienia algorytmu lasu losowego, który tak jak wspomnieliśmy jest zbiorem klasyfikatorów, gdzie każdy klasyfikator jest drzewem decyzyjnym. Każde drzewo wchodzące w skład lasu losowego jest uczone na specjalnie wylosowanej dla niego próbce danych pochodzącej ze zbioru uczącego, treningowego. Dodatkowo, w trakcie budowania drzewa decyzyjnego nie wszystkie atrybuty są brane pod uwagę przy wyznaczaniu reguły decyzyjnej w węźle. Losowany jest pewien podzbiór atrybutów, na podstawie których wyznaczana jest reguła decyzyjna w węźle. Obie opisane techniki działania na próbce danych i pewnym wylosowanym podzbiorze atrybutów stosowane są w celu zwiększenia stabilności odpowiedzi algorytmu i jego ochrony przed nadmiernym dopasowaniem do danych uczących, co było jedną z największych wad pojedynczego drzewa decyzyjnego i co przekłada się dodatkowo na lepszą skuteczność działania klasyfikatora na nowych danych. W trakcie przewidywania klasy dla próbki jest ona pokazywana wszystkim drzewom decyzyjnym, a jako końcowa decyzja o przynależności do klasy traktowanej jest przypisanie do klasy najczęściej wskazywanej przez drzewa decyzyjne w lesie. Dodatkowym plusem lasu losowego jest umiejętność wyznaczenia ważności atrybutów wejściowych. \cite{PPlonski}\\
+Po przedstawieniu zasad konstruowania drzewa decyzyjnego omówiony zostanie algorytm lasu losowego, który tak jak zostało wspomniane jest zbiorem klasyfikatorów, gdzie każdy klasyfikator jest drzewem decyzyjnym. Każde drzewo wchodzące w skład lasu losowego jest uczone na specjalnie wylosowanej dla niego próbce danych pochodzącej ze zbioru uczącego, treningowego (tzw. losowanie bootstrapowe). Dodatkowo, w trakcie budowania drzewa decyzyjnego nie wszystkie atrybuty są brane pod uwagę przy wyznaczaniu testu na atrybucie do podziału w węźle. Losowany jest pewien podzbiór atrybutów, na podstawie których wyznaczany jest najlepszy podział na atrybucie w węźle. Obie opisane techniki działania na próbce danych i pewnym wylosowanym podzbiorze atrybutów stosowane są w celu zwiększenia stabilności odpowiedzi algorytmu i jego ochrony przed nadmiernym dopasowaniem do danych uczących, co było jedną z największych wad pojedynczego drzewa decyzyjnego i co przekłada się dodatkowo na lepszą skuteczność działania klasyfikatora na nowych danych. W trakcie przewidywania klasy dla próbki jest ona pokazywana wszystkim drzewom decyzyjnym, a jako końcowa decyzja o przynależności do klasy traktowanej jest przypisanie do klasy najczęściej wskazywanej przez drzewa decyzyjne w lesie. Dodatkowym plusem lasu losowego jest umiejętność wyznaczenia ważności atrybutów wejściowych. \cite{PPlonski}\\
 
-Przykładowy proces wnioskowania na podstawie algorytmu lasu losowego możemy zobaczyć na poniższym obrazie
+Przykładowy proces wnioskowania na podstawie algorytmu lasu losowego można zobaczyć na poniższym rysunku
 \begin{figure}[h] 
         \centering\includegraphics[width=14cm]{figures/randomForestModel.JPG}
         \caption{Przykładowy model lasu losowego \cite{Geron}}
@@ -140,7 +165,7 @@ Przykładowy proces wnioskowania na podstawie algorytmu lasu losowego możemy zo
     \begin{equation}
 D = \big\{(x_{i}, c_{i}) | x_{i} \in R^{p}, c_{i} \in \{-1, 1\}\big\}_{i=1}^{N}
     \end{equation}
-    \item Szukamy klasyfikatora pozwalającego na podział całej przestrzeni $\omega$ na dwa rozłączne obszary odpowiadającej klasom {1,-1} oraz pozwalającego jak najlepiej klasyfikować nowe obiekty x do klas
+    \item Szukany jest klasyfikator pozwalający na podział całej przestrzeni $\omega$ na dwa rozłączne obszary odpowiadającej klasom {1,-1} oraz pozwalający jak najlepiej klasyfikować nowe obiekty x do klas
     \item Podejście opiera się na znalezieniu tzw. granicy decyzyjnej między klasami → g( x )
 \end{itemize}
 Dodatkowo dwie klasy są liniowo separowalne, jeśli istnieje hiperpłaszczyzna H postaci: \[g(x) = w^Tx + b\] przyjmująca wartości: 
@@ -181,14 +206,14 @@ Dodatkowo parametry granicy wyznacza się tak, aby maksymalne marginesy (margine
 \end{figure}
 
 Tak więc problem ten sprowadza się do optymalizacji kwadratowej z liniowymi ograniczeniami (uogólnione zadanie optymalizacji). 
-Czasami jednak mamy do czynienia z sytuacją podczas której nie mamy możliwości w pełni liniowej separacji klas. W takiej sytuacji wykorzystuje się zmienne osłabiające \definicja{$\xi_{i} \ge 0$}, które dobiera się dla każdego przykładu uczącego. Jej wartość zmniejsza margines separacji. Jeżeli $0 \le \xi_{i} \le 1$, to punkt danych $(xi,di)$ leży wewnątrz strefy separacji, ale po właściwej stronie, a w sytuacji gdy $\xi_{i} \ge 1$, to punkt leży po niewłaściwej stronie hiperpłaszczyzny i nastąpi błąd klasyfikacji. 
+Czasami jednak zdarza się sytuacja podczas której nie ma możliwości w pełni liniowej separacji klas. W takiej sytuacji wykorzystuje się zmienne osłabiające \definicja{$\xi_{i} \ge 0$}, które dobiera się dla każdego przykładu uczącego. Jej wartość zmniejsza margines separacji. Jeżeli $0 \le \xi_{i} \le 1$, to punkt danych $(xi,di)$ leży wewnątrz strefy separacji, ale po właściwej stronie, a w sytuacji gdy $\xi_{i} \ge 1$, to punkt leży po niewłaściwej stronie hiperpłaszczyzny i nastąpi błąd klasyfikacji. 
 \[
     \begin{cases}
             bi1,&  wx+b = 1 - \xi\\
             bi2,& wx+b= -1 + \xi
     \end{cases}
 \]
-Również tutaj występuje konflikt doboru marginesu. Szeroki margines to dużo błędów i odwrotnie. Kończąc rozważania dotyczące liniowej maszyny wektorów nośnych, nasz problem znalezienia granicy decyzyjnej sprowadza się do minimalizacji wyrażenia:
+Również tutaj występuje konflikt doboru marginesu. Szeroki margines to dużo błędów i odwrotnie. Kończąc rozważania dotyczące liniowej maszyny wektorów nośnych, obecny problem znalezienia granicy decyzyjnej sprowadza się do minimalizacji wyrażenia:
 \[
 L(w) = \frac{\|\vec{w}\|}{2} + C\big(\sum_{i=1}^{N}\xi_{i}^{k}\big)
 \]
@@ -215,13 +240,13 @@ Można zauważyć, że metoda SVM jest silną metodą pozwalającą na rozwiązy
 \subsection{Sztuczne Sieci Neuronowe - SNN}
 \label{SNN-opis}
 
-\definicja{Sztuczna sieć neuronowa} ogólna nazwa struktur matematycznych i ich programowych lub sprzętowych modeli, realizujących obliczenia lub przetwarzanie sygnałów poprzez rzędy elementów przetwarzających, zwanych sztucznymi neuronami, wykonujących pewną podstawową operację na swoim wejściu. Oryginalną inspiracją takiej struktury była budowa naturalnych neuronów, łączących je synaps, oraz układów nerwowych, w szczególności mózgu \cite{Wiki:SNN}. Sztuczne sieci neuronowe charakteryzują się tym, że mają zdolność do odwzorowania różnych zależności pomiędzy sygnałami wejściowymi i wyjściowymi. Sztuczna sieć neuronowa składa się z wielu połączonych neuronów, a kady neuron można interpretować jako pewna kombinacja matematyczna cech wejściowych wraz z przypisanymi im wagami. Wyjście neuronu to pewna funkcja matematyczna, która przekształca daną kombinację danych wejściowych i przekazuje taki wynik na swoje wyjście. Graficzna reprezentacja takiego neuronu ma się następująco \cite{Prezentacja:SNN} \cite{KrawiecStefanowski03} --- \textbf{to jest także ze skryptu KKJS}:
+\definicja{Sztuczna sieć neuronowa} ogólna nazwa struktur matematycznych i ich programowych lub sprzętowych modeli, realizujących obliczenia lub przetwarzanie sygnałów poprzez rzędy elementów przetwarzających, zwanych sztucznymi neuronami, wykonujących pewną podstawową operację na swoim wejściu. Oryginalną inspiracją takiej struktury była budowa naturalnych neuronów, łączących je synaps, oraz układów nerwowych, w szczególności mózgu \cite{Wiki:SNN}. Sztuczne sieci neuronowe charakteryzują się tym, że mają zdolność do odwzorowania różnych zależności pomiędzy sygnałami wejściowymi i wyjściowymi. Sztuczna sieć neuronowa składa się z wielu połączonych neuronów, a kady neuron można interpretować jako pewna kombinacja matematyczna cech wejściowych wraz z przypisanymi im wagami. Wyjście neuronu to pewna funkcja matematyczna, która przekształca daną kombinację danych wejściowych i przekazuje taki wynik na swoje wyjście. Graficzna reprezentacja takiego neuronu ma się następująco \cite{Prezentacja:SNN,KrawiecStefanowski03}:
 \begin{figure}[H] 
         \centering\includegraphics[width=12cm,height=6cm]{figures/SNN.png}
         \caption{Sztuczny neuron}\label{SVM-neuron}
 \end{figure}
 
-Podstawowe elementy składowe: 
+Podstawowe elementy składowe neuronu: 
 \begin{itemize}
     \item n wejść neuronu wraz z wagami $w_{i}$ (wektor wag w i wektor sygnałów wejściowych x)
     \item jeden sygnał wyjściowy y
@@ -240,7 +265,7 @@ e = \sum_{i=0}^{N} w_{i} x_{i}  = w^{T} x
 y = f(e)
 \]
 \end{itemize}
-Kluczowe znaczenie dla działania neuronu ma funkcja aktywacji. Mamy do wyboru liniową funkcję lub nielinową (ciągła i nieciągła, unipolarna i bipolarna).
+Kluczowe znaczenie dla działania neuronu ma funkcja aktywacji. Jest do wyboru funkcja liniowa lub nielinowa (ciągła i nieciągła, unipolarna i bipolarna).
 
 W literaturze wyróżnia się dwa ogólne typy sieci neuronowych i są to: jednokierunkowe SNN oraz rekurencjne SNN (sieci ze sprzężeniami zwrotnymi np. sieć Hopfielda albo sieci uczenia się przez współzawodnictwo).
 Sieci jednokierunkowe to sieci o jednym kierunku przepływu sygnałów. Szczególnym przypadkiem architektury jednokierunkowej jest sieć warstwowa, reprezentująca zdecydowanie najpopularniejszą topologię.
@@ -302,7 +327,7 @@ Jednak kluczowym konceptem sprawiającym, że sztuczne sieci neuronowe są tak p
 
 Na podstawie wstecznej propagacji błędów, sieci neuronowe modyfikują wagi dla każdego neuronu dopowiadające danym wejściowym w celu minimalizacji funkcji nazywanej \definicja{funkcją straty}.
 
-Wartości początkowe wag muszą być zainicjowane przed przystąpieniem do procesu uczenia i zazwyczaj dokonuje się tego w sposób losowy lub na podstawie pewnego rozkładu prawdopodobieństwa. Kluczowym czynnikiem do prędkości oraz jakości otrzymywanych wyników jest współczynnik $\eta$, który już mogliśmy zauważyć w równaniu \ref{eqn:delta}. Decyduje on o wpływie błędu popełnianego przez neuron na korektę wartości wag. Właściwy dobór ma kluczowe znaczenie dla prędkości zbieżności algorytmu, a jego zbyt mała wartość spowalnia proces uczenia i zwiększa ryzyko
+Wartości początkowe wag muszą być zainicjowane przed przystąpieniem do procesu uczenia i zazwyczaj dokonuje się tego w sposób losowy lub na podstawie pewnego rozkładu prawdopodobieństwa. Kluczowym czynnikiem do prędkości oraz jakości otrzymywanych wyników jest współczynnik $\eta$, który można było zauważyć w równaniu \ref{eqn:delta}. Decyduje on o wpływie błędu popełnianego przez neuron na korektę wartości wag. Właściwy dobór ma kluczowe znaczenie dla prędkości zbieżności algorytmu, a jego zbyt mała wartość spowalnia proces uczenia i zwiększa ryzyko
 wpadnięcia w pułapkę lokalnego minimum \cite{Prezentacja:SNN}. 
 
 W momencie gdy ludzie zaczęli interesować się tematem uczenia maszynowego oraz sieciami neuronowymi zaczęto szerzej zgłębiać temat stawiając coraz to trudniejsze wyzwania. Powstało mnóstwo różnych struktur sieci. Te bardzo głębokie składające się z kilkunastu, a nawet kilkuset warstw ukrytych oraz sieci, które przyjęły trochę inną koncepcję przetwarzania danych. Jednym z dużych zmian, jakie nastąpiły w kwestii przetwarzania obrazów, było zastosowanie konwolucyjnych sieci neurnowych (\english{convolutional neural network})\cite{CNN}. Struktura takiej sieci różni się od podstawowej koncepcji tym, że zamiast w pełni połączonych warstw neuronów, posiada ona \definicja{konwolucyjne warstwy}, które mają za zadanie znalezienie pewnych wzorców na obrazie - tych większych jak i tych mniejszych. Wiele zastosowanych filtrów skanujących obraz wraz z połączeniem warstwową łączącą (\english{pooling layer}) daje w rezultacie o wiele większą skuteczność w dziedzinie przetwarzania obrazów dzięki wydobywaniu z obrazów pewnych zależności oraz połączeń pomiędzy pikselami tworzącymi obiekt \cite{Prezentacja:KKCNN} \cite{Prezentacja:CNNintro}.
@@ -317,10 +342,16 @@ zadanego zbioru przykładów co skutkuje, że w trakcie uczenia błąd
 
 Od początku historii SNN do teraz powstało mnóstwo konceptów, pomysłów, sztuczek i schematów które zapewniają lepsze generalizowanie, szybsze zbieganie do minimum, które nie sposób zebrać i opisać w jednym miejscu. Wiele technik zapewniło uczenie bardzo dużych sieci neuronowych zapewniających stabilne gradienty (jednym z problemów podczas nauki SNN jest niestabilność gradientów, które zanikały wraz z postępem algorytmu lub wręcz eksplodowały do bardzo dużych wartości) \cite{gradient}. Powstało również wiele funkcji aktywacji oraz sposobów inicjalizacji początkowych wag sieci.
 
+\section{Algorytmy dla danych niezbalansowanych}
+
+\textit{Tutaj opisac MRBag} - myśle że to jest miejsce do uzupełnienia
+
 \section{Sposób oceny wyników predykcji}
 \label{section:ocenaWynikow}
 
-Różne algorytmy dają wyniki w różnych formatach. Przy pomocy jednych uzyskujemy tylko konkretną klasę, do której przynależy konkretne wejście, a inne przyporządkowują rozkład prawdopodobieństwa możliwych wyników klasyfikacji. W naszym przypadku mamy do czynienia z obiema sytuacjami. Podczas doboru sposobu oceny algorytmów głównym celem jest dobranie takich miar, aby móc wzajemnie porównywać zastosowane algorytmy i na tej podstawie dobrać najlepsze podejście. Ocena jakości rozwiązań opierała się zatem na policzeniu \definicja{dokładności} (\english{accuracy}) na zbiorze testowym (wynoszącym 10\% całego zbioru danych), macierzy pomyłek oraz wynikające z niej miary takie jak: \definicja{precyzja} (\english{precision}, interpretować ją można jako stosunek tp / (tp + fp), gdzie tp to liczba poprawnie sklasyfikowanych przykładów, a fp to liczba niepoprawnie sklasyfikowanych przykładów.), \definicja{czułość} (\english{recall}, interpretować można jako stosunek tp / (tp + fn), gdzie tp jest liczbą poprawnie sklasyfikowanych przykładów, a fn liczbą niepoprawnie sklasyfikowanych przykładów.) oraz \definicja{F-score} (\definicja{F-score} interpretuje się jako ważoną średnią harmoniczną precyzji i czułości, gdzie wynik \definicja{F-score} osiąga najwyższą wartość przy 1, a najniższą przy 0), którą wyznaczono przy użyciu średniej typu „macro” (oblicza metryki dla każdej etykiety, a następnie wyznacza ich nieważoną średnią. Metoda ta nie uwzględnia niezbalansowania danych) \cite{SKfscore}. Dodatkowo w celu porównania zastosowana została macierz pomyłek, której schemat można zobaczyć w tabeli \ref{tab:macierz}
+Różne algorytmy dają wyniki w różnych formie. Niektóre wskazują tylko  konkretną klasę, do której przynależy konkretne wejście, a inne przyporządkowują przykładowi rozkład prawdopodobieństwa możliwych wyników klasyfikacji. W badanym w rozprawie zadaniu mamy do czynienia z obiema sytuacjami. 
+
+Podczas doboru sposobu oceny algorytmów głównym celem jest dobranie takich miar tak, aby móc wzajemnie porównywać zastosowane algorytmy i na tej podstawie dobrać najlepsze podejście. Ocena jakości rozwiązań opierała się zatem na policzeniu \definicja{dokładności / trafności} (\english{accuracy}) na zbiorze testowym (w danych sportowych wynoszącym 10\% całego zbioru danych), macierzy pomyłek oraz wynikające z niej miary takie jak: \definicja{precyzja} (\english{precision}, interpretować ją można jako stosunek tp / (tp + fp), gdzie tp to liczba poprawnie sklasyfikowanych przykładów, a fp to liczba niepoprawnie sklasyfikowanych przykładów.), \definicja{czułość} (\english{recall}, interpretować można jako stosunek tp / (tp + fn), gdzie tp jest liczbą poprawnie sklasyfikowanych przykładów, a fn liczbą niepoprawnie sklasyfikowanych przykładów.) oraz \definicja{F-score} (\definicja{F-score} interpretuje się jako ważoną średnią harmoniczną precyzji i czułości, gdzie wynik \definicja{F-score} osiąga najwyższą wartość przy 1, a najniższą przy 0), którą wyznaczono przy użyciu średniej typu „macro” (oblicza metryki dla każdej etykiety, a następnie wyznacza ich nieważoną średnią. Metoda ta nie uwzględnia niezbalansowania danych) \cite{SKfscore}. Dodatkowo w celu porównania zastosowana została macierz pomyłek, której schemat można zobaczyć w tabeli \ref{tab:macierz}
 
 \begin{center}
 \begin{table}[H]
@@ -342,5 +373,5 @@ Różne algorytmy dają wyniki w różnych formatach. Przy pomocy jednych uzysku
 \end{table}
 \end{center}
 
-Dodatkowo przetestowano algorytmy w sposób, w którym dane wejściowe podzielono na bloki następujące po sobie. Następnie wyuczono algorytmy na pierwszym bloku i testowano jego działanie na mniejszym bloku, który w zbiorze danych występował zaraz po bloku uczącym. Kolejno do dotychczasowego zbioru uczącego dołożono dane z poprzedniego bloku testowego i na podstawie nowego zbioru znów dokonano uczenia maszynowego by następnie dokonać ewaluacji na kolejnym fragmencie zbioru testowego. Proces ten powtarzano, aż do wykorzystania wszystkich dostępnych i przygotowanych danych.
+W rozprawie dodatkowo przetestowano algorytmy w przyrostowy sposób, w którym dane wejściowe podzielono na bloki następujące po sobie. Następnie wyuczono algorytmy na pierwszym bloku i testowano jego działanie na koejnym bloku, który w zbiorze danych występował zaraz po bloku uczącym. Kolejno do dotychczasowego zbioru uczącego dołożono dane z poprzedniego bloku testowego i na podstawie nowego zbioru znów dokonano uczenia maszynowego by następnie dokonać ewaluacji na kolejnym fragmencie zbioru testowego. Proces ten powtarzano, aż do wykorzystania wszystkich dostępnych i przygotowanych danych.
 
