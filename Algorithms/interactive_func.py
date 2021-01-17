@@ -56,7 +56,7 @@ class Interactive():
         self.dataset = None
         self.list_of_parameters = LIST_OF_PARAMETERS
         self.lista = list()
-        self.model_list = ['DenseNetwork', "SVM", "All"]
+        self.model_list = ['DenseNetwork', "SVM", "RandomForest", "LogisticRegression", "All"]
 
 
     def _get_teams_list_for_interactive(self):
