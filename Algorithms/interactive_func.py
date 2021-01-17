@@ -114,6 +114,21 @@ class Interactive():
         data = scaler.transform(data)
         result = model.predict(data)[0]
         return result 
+
+    def RandomForest(self, data):
+        with open('saved\\randomForest.pkl', 'rb') as f:
+            model = pickle.load(f)
+        result = model.predict(data)[0]
+        return result 
+
+    def LogisticRegression(self, data):
+        with open('saved\\LogisticRegression.pkl', 'rb') as f:
+            model = pickle.load(f)
+        probas = model.predict_proba(data[:, :-3])
+        text = f"\n\nLogisticRegression probability: {probas[0]}"
+        result = np.argmax(probas)
+        return result, text 
+
     def compute_result(self, home_team = 'Manchester United', away_team = 'Bournemouth', model_str = 'DenseNetwork'):
         data = self._get_data_for_model(home_team, away_team)
         if data == []:
@@ -131,6 +146,17 @@ class Interactive():
             data = np.expand_dims(data, axis=0)
             result = self.svm(data)
             result_text = f"\n-------\nModel output: {output[result]}\n-------"
+
+        elif model_str == 'RandomForest':
+            data = np.expand_dims(data, axis=0)
+            result = self.RandomForest(data)
+            result_text = f"\n-------\nModel output: {output[result]}\n-------"
+
+        elif model_str == 'LogisticRegression':
+            data = np.expand_dims(data, axis=0)
+            result, text = self.LogisticRegression(data)
+            print(text)
+            result_text = f"\n-------\nModel output: {output[result]}\n-------"
                    
         elif model_str == 'All':
             data = np.expand_dims(data, axis=0)
@@ -138,26 +164,22 @@ class Interactive():
             result, text = self.dense_network(data)
             result_list.append(result)
             result_list.append(self.svm(data))
+            result_list.append(self.RandomForest(data))
+            result, text = self.LogisticRegression(data)
+            result_list.append(result)
 
 
-            values = list(Counter(result_list).values())
-            if len(values) >= 2 and values[0] == values[1]:
+            values = Counter(result_list).most_common()
+            if values[0][1] >= 3:
+                result = Counter(result_list).most_common()[0][0]
+                result_text = f"\n-------\nModels output: {output[int(result)]}\n-------"
+            else:
                 result_dict = dict()
                 for i, model in zip(result_list, self.model_list):
                     result_dict[model] = output[int(i)]
-                result_text = f'Zbyt duża rozbieżność by zagregować wyniki, wybierz jeden model. {result_dict}'
-            else:
-                result = list(Counter(result_list).keys())[0]
-                result_text = f"\n-------\nModels output: {output[result]}\n-------"
+                result_text = f'Zbyt duża rozbieżność by zagregować wyniki, wybierz jeden model. \n{result_dict}'
 
 
 
         print(result_text)
         return 
-
-
-
-
-
-
-
