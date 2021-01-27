@@ -2,7 +2,6 @@
 
 \documentclass[polish,bachelor,a4paper,oneside]{ppfcmthesis}
 
-
 \usepackage[utf8]{inputenc}
 \usepackage[OT4]{fontenc}
 \usepackage{amsmath}
@@ -58,22 +57,43 @@
 \frontmatter\pagestyle{empty}%
 \maketitle\cleardoublepage%
 
+
 %--------------------------------------
-% Miejsce na kartę pracy dyplomowej
+% Podziękowania
+\newpage\null\thispagestyle{empty}\newpage
+\begin{center}
+    \huge Podziękowania
+\end{center}
+Składamy serdeczne podziękowania naszemu Promotorowi, dr hab. inż. Jerzemu Stefanowskiemu prof. nadzw. PP za cenne uwagi przekazywane od początku współpracy. W szczególności za wszechstronną pomoc, która była dużym wsparciem podczas pisania pracy, a także za cały poświęcony czas podczas tworzenia projektu.
+
 %--------------------------------------
 
-\thispagestyle{empty}\vspace*{\fill}%
-\begin{center}Tutaj będzie karta pracy dyplomowej;\\oryginał wstawiamy do wersji dla archiwum PP, w pozostałych kopiach wstawiamy ksero.\end{center}%
-\vfill\cleardoublepage%
+%--------------------------------------
+% Streszczenie
+\newpage\null\thispagestyle{empty}\newpage
+\newpage
+\begin{center}
+    \huge Streszczenie
+\end{center}
+Analiza danych sportowych, w szczególności przewidywanie wyników w rozgrywkach sportowych, jest przedmiotem zainteresowania praktyków i badaczy od wielu lat. Pomimo zaproponowania już wielu narzędzi wspomagających predykcję wyniku meczu, uzyskiwane rezultaty wciąż pozostawiają przestrzeń na poprawę i doskonalenie. W niniejszej pracy podjęto próbę stworzenia systemu, który pozwoliłby wskazać wynik nadchodzącego meczu piłkarskiego pomiędzy dwoma drużynami z pierwszej ligi angielskiej na podstawie starannie zagregowanych danych pochodzących z wielu źródeł. Architektura systemu zawiera bazę danych, web API udostępniające dane, moduł związany zarówno ze wstępnym przetwarzaniem, jak i selekcją cech oraz przygotowujący dane w odpowiednim formacie. Utworzono również środowisko \textit{Jupyter Notebook}, w którym nauczone zostają odpowiednie modele klasyfikacyjne, na których później zostaje przeprowadzona predykcja końcowa. Przeprowadzono obszerne badania eksperymentalne wybranych algorytmów uczenia klasyfikatorów oraz znaczenia atrybutów dla klasyfikacji. Stworzono także interaktywny notebook, dla potencjalnych analityków sportowych, umożliwiający wybór drużyn rozgrywających dane spotkanie oraz algorytmu, według którego ma zostać przeprowadzona ostateczna predykcja wyniku.\\\\
+
+ 
+
+\begin{center}
+    \huge Abstract
+\end{center}
+The analysis of sports data, in particular the prediction of results in sports competitions, has been of interest to practitioners and researchers for many years. Despite the development of many tools supporting the prediction of the result of a sport match, the obtained outcomes still leave room for improvement. In this thesis, an attempt was made to create a system which would predict the result of an upcoming match between two teams from the English Premier League on the basis of carefully aggregated data from many sources. Archtecture of the system includes a database, web API that provides data, python module responsible for preprocessing, feature selection and preparation of data in a proper format and a \textit{Jupyter Notebook} environment in which trained classification models are used to conduct final prediction. Extensive experimental studies of selected classifier learning algorithms and the significance of attributes for classification were conducted. An interactive notebook was also created for potential sports analysts, which allow them to choose teams playing a given match and an algorithm by which the final prediction of the result is to be carried out.
+
+%--------------------------------------
 
 %--------------------------------------
 % Spis treści
 %--------------------------------------
-
+\newpage\null\thispagestyle{empty}\newpage
+\newpage
 \pagenumbering{Roman}\pagestyle{ppfcmthesis}%
 \tableofcontents* 
 \cleardoublepage % Zaczynamy od nieparzystej strony
-
 %--------------------------------------
 % Rozdziały
 %--------------------------------------
@@ -92,19 +112,23 @@
 % Literatura
 %--------------------------------------
 
-\bibliographystyle{unsrt}{\raggedright\sloppy\small\bibliography{bibliografia}}
+\bibliographystyle{plain}{\raggedright\sloppy\small\bibliography{bibliografia}}
 
 %--------------------------------------
 % Dodatki
 %--------------------------------------
-
+\newpage\null\thispagestyle{empty}\newpage
 \cleardoublepage\appendix%
-\newpage
-\input{chapters/zalacznik.tex}
+\chapter{Repozytorium}
+\noindent Repozytorium na stronie \url{https://github.com/Put-EngineeringThesis-soccer-prediction/SoccerMatchPredictor} zawiera oprogramowanie stworzone przez zespół. W folderze \textit{Algorithms} można znaleźć implementacje algorytmów zawartą w plikach \textit{Jupyter Notebook} oraz plik \textit{Interactive.ipynb} zawierający interaktywne środowisko dla użytkowników.
 
+W folderze \textit{DataProjects} znajdują się solucje komponentów  \textit{Match Predict Data Importer} oraz \textit{Match Predict Data Provider} jak i plik zawierający kopie zapasową bazy danych o nazwie \textit{kaggle\_filtered.bacpac}. W folderze \textit{Preprocesssing} znajduję się moduł Pythona z udostępnionymi metodami, które wstępnie przetwarzają dane. Katalog \textit{visualization} zawiera przeprowadzoną wizualizację danych w formacie \textit{Jupyter Notebook} lub wygenerowanym plikiem html.
+
+Folder \textit{Thesis} zawiera pliki źródłowe plików .tex napisanej pracy dyplomowej.
 %--------------------------------------
 % Informacja o prawach autorskich
 %--------------------------------------
+\newpage\null\thispagestyle{empty}\newpage
 
 \ppcolophon
 

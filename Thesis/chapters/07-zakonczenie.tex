@@ -1,10 +1,17 @@
-
 \chapter{Uwagi końcowe}
 
-Zakończenie pracy zwane również Uwagami końcowymi lub Podsumowaniem powinno zawierać ustosunkowanie
-się autora do zadań wskazanych we wstępie do pracy, a w szczególności do celu i zakresu pracy oraz
-porównanie ich z faktycznymi wynikami pracy. Podejście takie umożliwia jasne określenie stopnia
-realizacji założonych celów oraz zwrócenie uwagi na wyniki osiągnięte przez autora w ramach jego
-samodzielnej pracy.
+\noindent W dzisiejszym sporcie coraz większą rolę odgrywa specjalna analiza dokonywana przed każdym spotkaniem w celu lepszego poznania charakterystyki przeciwnika lub swoich szans w starciu z nim. Potrzebne są nowe narzędzia wspomagające analityków dokonujących takich analiz. Mogłyby one znacząco ułatwić zadanie, zwiększając możliwości dobrego wykorzystania odpowiedniej taktyki, poprawiając tym samym szanse na zwycięstwo. 
 
-Integralną częścią pracy są również dodatki, aneksy i załączniki zawierające stworzone w ramach pracy programy, aplikacje i projekty.
+Celem pracy było utworzenie systemu informatycznego - złożonego oprogramowania, który pozwoliłby określić zwycięzcę konfrontacji między dwoma drużynami z piłkarskiej ligi angielskiej. Wykorzystuje w tym celu historyczne dane, zagregowane z różnych źródeł, na temat drużyn, graczy oraz meczów zebrane i umieszczone w spójnym repozytorium, będącym bazą danych. Modelowi użytkownicy (np. analitycy sportowi) mają otrzymać odpowiednio sparametryzowane algorytmy uczenia maszynowego gotowe do użycie przy pomocy środowiska \textit{Jupyter Notebook}.
+
+Pierwszym etapem budowy powyższego systemu było pobranie wyselekcjonowanych danych do bazy danych, później wybranie odpowiednich cech najbardziej pasujących do zadania, które mogą być wykorzystane w predykcji wyniku spotkania. Następnie dokonano wyboru oraz przeprowadzono uczenie czterech modeli uczenia maszynowego. 
+
+Przeprowadzono ocenę wyników na zbiorze testowym. Z punktu widzenia globalnej trafności najlepiej poradził sobie algorytm regresji logistycznej uzyskując dokładność $53.4\%$. Bardzo dobrze spisała się również zaimplementowana sieć neuronowa, która uzyskała dokładność równą $50.79\%$, oraz algorytm losowego lasu ($50.66\%$). Nieco niższą dokładność predykcji osiągał klasyfikator nauczony algorytm maszyn wektorów nośnych. Mimo wszystko, wymienione algorytmy pozwoliły na osiągnięcie globalnej trafności na dość podobnym poziomie.  W rezultacie,  obserwując różnice w poprawnym przewidywaniu poszczególnych klas, użytkownik może samemu wybrać, który z modeli spełnia jego preferencje lub zaagregować ich predykcje jako zespół klasyfikatorów. Dodatkowo, w przypadku niezbalansowanych danych, najlepszym podejściem okazała się być relatywnie prosta metoda usuwająca przykłady z klasy o największej liczbie przykładów (zauważmy, że dodatkowo sprawdzany algorytm MRBBag wykorzystuje także losowanie ukierunkowane na tzw. redukcję liczności klasy większościowej). 
+
+Po fazie testowania wszystkie algorytmy zostały następnie nauczone na całym dostępnym zbiorze danych oraz dostarczone do powłoki interaktywnej będącej środowiskiem wykonawczym użytkownika, w którym to użytkownik może bez specjalistycznej wiedzy dokonać predykcji nadchodzącego, interesującego go spotkania.
+
+Pomimo że udało się spełnić założenia i cele pracy, nie znaczy to, że system ten nie może być dalej rozwijany. Jednym z usprawnień mogłoby być zintegrowanie większej ilości aktualnych danych, które potencjalnie wpłynęłyby pozytywnie na wyniki predykcji algorytmów. Niezależnie można by zbadać charakterystykę rozkładów danych, aby lepiej poznać źródła trudności dla  uczenia klasyfikatorów.
+
+Innym pomysłem byłoby udoskonalenie tej części oprogramowania, która odpowiedzialna jest za interakcję z użytkownikiem, tak aby nie wymagała ona instalowania i obsługi dodatkowych, zewnętrznych programów. W tej wersji rozwojowej powinno się ułatwić interakcje z mniej doświadczonymi użytkownikami. Ponadto stworzony system można by rozbudować o dodatkowe narzędzia służące do prezentacji statystyk wykorzystanych danych.
+
+Kolejną drogą rozwoju jest rozszerzenie istniejącego zbioru danych o dane pochodzące z innych lig krajowych piłki nożnej. Mimo iż założeniem była predykcja tylko dla ligi angielskiej, nic nie stoi na przeszkodzie, aby umożliwić analizę dla innych drużyn spoza tej stosunkowo małej grupy. Pozwoliłoby to na szersze spojrzenie na mecze piłki nożnej biorąc pod uwagę indywidualny styl każdej z lig.
